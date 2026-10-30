@@ -155,6 +155,40 @@ void main() {
     );
   });
 
+  testWidgets('八个国家均显示正确的角色数量', (WidgetTester tester) async {
+    _usePhoneViewport(tester);
+    await tester.pumpWidget(const GenshinApp());
+    await tester.pump(const Duration(milliseconds: 300));
+
+    await tester.tap(find.text('→'));
+    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 900));
+
+    const Map<String, String> expectedCounts = <String, String>{
+      '蒙德': '23 位',
+      '璃月': '22 位',
+      '稻妻': '17 位',
+      '须弥': '14 位',
+      '枫丹': '13 位',
+      '纳塔': '11 位',
+      '挪德卡莱': '8 位',
+      '至冬': '9 位',
+    };
+
+    for (final MapEntry<String, String> entry in expectedCounts.entries) {
+      await tester.tap(find.text(entry.key));
+      await tester.pump();
+      await tester.pump(const Duration(milliseconds: 900));
+
+      expect(find.text(entry.key), findsOneWidget);
+      expect(find.text(entry.value), findsOneWidget);
+
+      await tester.tap(find.byType(BackButton));
+      await tester.pump();
+      await tester.pump(const Duration(milliseconds: 900));
+    }
+  });
+
   testWidgets('七种元素图标资源均已声明且可读取', (WidgetTester tester) async {
     const List<String> elementNames = <String>[
       'anemo',

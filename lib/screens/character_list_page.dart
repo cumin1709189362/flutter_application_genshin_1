@@ -286,6 +286,463 @@ const List<Character> _liyueCharacters = <Character>[
   ),
 ];
 
+/// 稻妻角色数据，严格按英文名 A-Z 升序排列。
+const List<Character> _inazumaCharacters = <Character>[
+  Character(
+    enName: 'Arataki Itto',
+    zhName: '荒泷一斗',
+    elementColor: Color(0xFFCC9046),
+    elementIconPath: 'assets/elements/geo.png',
+  ),
+  Character(
+    enName: 'Chiori',
+    zhName: '千织',
+    elementColor: Color(0xFFCC9046),
+    elementIconPath: 'assets/elements/geo.png',
+  ),
+  Character(
+    enName: 'Gorou',
+    zhName: '五郎',
+    elementColor: Color(0xFFCC9046),
+    elementIconPath: 'assets/elements/geo.png',
+  ),
+  Character(
+    enName: 'Kaedehara Kazuha',
+    zhName: '枫原万叶',
+    elementColor: Color(0xFF359697),
+    elementIconPath: 'assets/elements/anemo.png',
+  ),
+  Character(
+    enName: 'Kamisato Ayaka',
+    zhName: '神里绫华',
+    elementColor: Color(0xFF35AACC),
+    elementIconPath: 'assets/elements/cryo.png',
+  ),
+  Character(
+    enName: 'Kamisato Ayato',
+    zhName: '神里绫人',
+    elementColor: Color(0xFF498FCC),
+    elementIconPath: 'assets/elements/hydro.png',
+  ),
+  Character(
+    enName: 'Kirara',
+    zhName: '绮良良',
+    elementColor: Color(0xFF64A038),
+    elementIconPath: 'assets/elements/dendro.png',
+  ),
+  Character(
+    enName: 'Kujou Sara',
+    zhName: '九条裟罗',
+    elementColor: Color(0xFF6957C2),
+    elementIconPath: 'assets/elements/electro.png',
+  ),
+  Character(
+    enName: 'Kuki Shinobu',
+    zhName: '久岐忍',
+    elementColor: Color(0xFF6957C2),
+    elementIconPath: 'assets/elements/electro.png',
+  ),
+  Character(
+    enName: 'Raiden Shogun',
+    zhName: '雷电将军',
+    elementColor: Color(0xFF6957C2),
+    elementIconPath: 'assets/elements/electro.png',
+  ),
+  Character(
+    enName: 'Sangonomiya Kokomi',
+    zhName: '珊瑚宫心海',
+    elementColor: Color(0xFF498FCC),
+    elementIconPath: 'assets/elements/hydro.png',
+  ),
+  Character(
+    enName: 'Sayu',
+    zhName: '早柚',
+    elementColor: Color(0xFF359697),
+    elementIconPath: 'assets/elements/anemo.png',
+  ),
+  Character(
+    enName: 'Shikanoin Heizou',
+    zhName: '鹿野院平藏',
+    elementColor: Color(0xFF359697),
+    elementIconPath: 'assets/elements/anemo.png',
+  ),
+  Character(
+    enName: 'Thoma',
+    zhName: '托马',
+    elementColor: Color(0xFFEC4923),
+    elementIconPath: 'assets/elements/pyro.png',
+  ),
+  Character(
+    enName: 'Yae Miko',
+    zhName: '八重神子',
+    elementColor: Color(0xFF6957C2),
+    elementIconPath: 'assets/elements/electro.png',
+  ),
+  Character(
+    enName: 'Yoimiya',
+    zhName: '宵宫',
+    elementColor: Color(0xFFEC4923),
+    elementIconPath: 'assets/elements/pyro.png',
+  ),
+  Character(
+    enName: 'Yumemizuki Mizuki',
+    zhName: '梦见月瑞希',
+    elementColor: Color(0xFF359697),
+    elementIconPath: 'assets/elements/anemo.png',
+  ),
+];
+
+/// 须弥角色数据，严格按英文名 A-Z 升序排列。
+const List<Character> _sumeruCharacters = <Character>[
+  Character(
+    enName: 'Alhaitham',
+    zhName: '艾尔海森',
+    elementColor: Color(0xFF64A038),
+    elementIconPath: 'assets/elements/dendro.png',
+  ),
+  Character(
+    enName: 'Candace',
+    zhName: '坎蒂丝',
+    elementColor: Color(0xFF498FCC),
+    elementIconPath: 'assets/elements/hydro.png',
+  ),
+  Character(
+    enName: 'Collei',
+    zhName: '柯莱',
+    elementColor: Color(0xFF64A038),
+    elementIconPath: 'assets/elements/dendro.png',
+  ),
+  Character(
+    enName: 'Cyno',
+    zhName: '赛诺',
+    elementColor: Color(0xFF6957C2),
+    elementIconPath: 'assets/elements/electro.png',
+  ),
+  Character(
+    enName: 'Dehya',
+    zhName: '迪希雅',
+    elementColor: Color(0xFFEC4923),
+    elementIconPath: 'assets/elements/pyro.png',
+  ),
+  Character(
+    enName: 'Dori',
+    zhName: '多莉',
+    elementColor: Color(0xFF6957C2),
+    elementIconPath: 'assets/elements/electro.png',
+  ),
+  Character(
+    enName: 'Faruzan',
+    zhName: '珐露珊',
+    elementColor: Color(0xFF359697),
+    elementIconPath: 'assets/elements/anemo.png',
+  ),
+  Character(
+    enName: 'Kaveh',
+    zhName: '卡维',
+    elementColor: Color(0xFF64A038),
+    elementIconPath: 'assets/elements/dendro.png',
+  ),
+  Character(
+    enName: 'Layla',
+    zhName: '莱依拉',
+    elementColor: Color(0xFF35AACC),
+    elementIconPath: 'assets/elements/cryo.png',
+  ),
+  Character(
+    enName: 'Nahida',
+    zhName: '纳西妲',
+    elementColor: Color(0xFF64A038),
+    elementIconPath: 'assets/elements/dendro.png',
+  ),
+  Character(
+    enName: 'Nilou',
+    zhName: '妮露',
+    elementColor: Color(0xFF498FCC),
+    elementIconPath: 'assets/elements/hydro.png',
+  ),
+  Character(
+    enName: 'Sethos',
+    zhName: '赛索斯',
+    elementColor: Color(0xFF6957C2),
+    elementIconPath: 'assets/elements/electro.png',
+  ),
+  Character(
+    enName: 'Tighnari',
+    zhName: '提纳里',
+    elementColor: Color(0xFF64A038),
+    elementIconPath: 'assets/elements/dendro.png',
+  ),
+  Character(
+    enName: 'Wanderer',
+    zhName: '流浪者',
+    elementColor: Color(0xFF359697),
+    elementIconPath: 'assets/elements/anemo.png',
+  ),
+];
+
+/// 枫丹角色数据，严格按英文名 A-Z 升序排列。
+const List<Character> _fontaineCharacters = <Character>[
+  Character(
+    enName: 'Charlotte',
+    zhName: '夏洛蒂',
+    elementColor: Color(0xFF35AACC),
+    elementIconPath: 'assets/elements/cryo.png',
+  ),
+  Character(
+    enName: 'Chevreuse',
+    zhName: '夏沃蕾',
+    elementColor: Color(0xFFEC4923),
+    elementIconPath: 'assets/elements/pyro.png',
+  ),
+  Character(
+    enName: 'Clorinde',
+    zhName: '克洛琳德',
+    elementColor: Color(0xFF6957C2),
+    elementIconPath: 'assets/elements/electro.png',
+  ),
+  Character(
+    enName: 'Emilie',
+    zhName: '艾梅莉埃',
+    elementColor: Color(0xFF64A038),
+    elementIconPath: 'assets/elements/dendro.png',
+  ),
+  Character(
+    enName: 'Escoffier',
+    zhName: '爱可菲',
+    elementColor: Color(0xFF35AACC),
+    elementIconPath: 'assets/elements/cryo.png',
+  ),
+  Character(
+    enName: 'Freminet',
+    zhName: '菲米尼',
+    elementColor: Color(0xFF35AACC),
+    elementIconPath: 'assets/elements/cryo.png',
+  ),
+  Character(
+    enName: 'Furina',
+    zhName: '芙宁娜',
+    elementColor: Color(0xFF498FCC),
+    elementIconPath: 'assets/elements/hydro.png',
+  ),
+  Character(
+    enName: 'Lynette',
+    zhName: '琳妮特',
+    elementColor: Color(0xFF359697),
+    elementIconPath: 'assets/elements/anemo.png',
+  ),
+  Character(
+    enName: 'Lyney',
+    zhName: '林尼',
+    elementColor: Color(0xFFEC4923),
+    elementIconPath: 'assets/elements/pyro.png',
+  ),
+  Character(
+    enName: 'Navia',
+    zhName: '娜维娅',
+    elementColor: Color(0xFFCC9046),
+    elementIconPath: 'assets/elements/geo.png',
+  ),
+  Character(
+    enName: 'Neuvillette',
+    zhName: '那维莱特',
+    elementColor: Color(0xFF498FCC),
+    elementIconPath: 'assets/elements/hydro.png',
+  ),
+  Character(
+    enName: 'Sigewinne',
+    zhName: '希格雯',
+    elementColor: Color(0xFF498FCC),
+    elementIconPath: 'assets/elements/hydro.png',
+  ),
+  Character(
+    enName: 'Wriothesley',
+    zhName: '莱欧斯利',
+    elementColor: Color(0xFF35AACC),
+    elementIconPath: 'assets/elements/cryo.png',
+  ),
+];
+
+/// 纳塔角色数据，严格按英文名 A-Z 升序排列。
+const List<Character> _natlanCharacters = <Character>[
+  Character(
+    enName: 'Chasca',
+    zhName: '恰斯卡',
+    elementColor: Color(0xFF359697),
+    elementIconPath: 'assets/elements/anemo.png',
+  ),
+  Character(
+    enName: 'Citlali',
+    zhName: '茜特菈莉',
+    elementColor: Color(0xFF35AACC),
+    elementIconPath: 'assets/elements/cryo.png',
+  ),
+  Character(
+    enName: 'Iansan',
+    zhName: '伊安珊',
+    elementColor: Color(0xFF6957C2),
+    elementIconPath: 'assets/elements/electro.png',
+  ),
+  Character(
+    enName: 'Ifa',
+    zhName: '伊法',
+    elementColor: Color(0xFF359697),
+    elementIconPath: 'assets/elements/anemo.png',
+  ),
+  Character(
+    enName: 'Kachina',
+    zhName: '卡齐娜',
+    elementColor: Color(0xFFCC9046),
+    elementIconPath: 'assets/elements/geo.png',
+  ),
+  Character(
+    enName: 'Kinich',
+    zhName: '基尼奇',
+    elementColor: Color(0xFF64A038),
+    elementIconPath: 'assets/elements/dendro.png',
+  ),
+  Character(
+    enName: 'Mavuika',
+    zhName: '玛薇卡',
+    elementColor: Color(0xFFEC4923),
+    elementIconPath: 'assets/elements/pyro.png',
+  ),
+  Character(
+    enName: 'Mualani',
+    zhName: '玛拉妮',
+    elementColor: Color(0xFF498FCC),
+    elementIconPath: 'assets/elements/hydro.png',
+  ),
+  Character(
+    enName: 'Ororon',
+    zhName: '欧洛伦',
+    elementColor: Color(0xFF6957C2),
+    elementIconPath: 'assets/elements/electro.png',
+  ),
+  Character(
+    enName: 'Varesa',
+    zhName: '瓦雷莎',
+    elementColor: Color(0xFF6957C2),
+    elementIconPath: 'assets/elements/electro.png',
+  ),
+  Character(
+    enName: 'Xilonen',
+    zhName: '希诺宁',
+    elementColor: Color(0xFFCC9046),
+    elementIconPath: 'assets/elements/geo.png',
+  ),
+];
+
+/// 挪德卡莱角色数据，严格按英文名 A-Z 升序排列。
+const List<Character> _nodKraiCharacters = <Character>[
+  Character(
+    enName: 'Aino',
+    zhName: '爱诺',
+    elementColor: Color(0xFF498FCC),
+    elementIconPath: 'assets/elements/hydro.png',
+  ),
+  Character(
+    enName: 'Columbina',
+    zhName: '哥伦比娅',
+    elementColor: Color(0xFF498FCC),
+    elementIconPath: 'assets/elements/hydro.png',
+  ),
+  Character(
+    enName: 'Flins',
+    zhName: '菲林斯',
+    elementColor: Color(0xFF6957C2),
+    elementIconPath: 'assets/elements/electro.png',
+  ),
+  Character(
+    enName: 'Illuga',
+    zhName: '叶洛亚',
+    elementColor: Color(0xFFCC9046),
+    elementIconPath: 'assets/elements/geo.png',
+  ),
+  Character(
+    enName: 'Ineffa',
+    zhName: '伊涅芙',
+    elementColor: Color(0xFF6957C2),
+    elementIconPath: 'assets/elements/electro.png',
+  ),
+  Character(
+    enName: 'Jahoda',
+    zhName: '雅珂达',
+    elementColor: Color(0xFF359697),
+    elementIconPath: 'assets/elements/anemo.png',
+  ),
+  Character(
+    enName: 'Lauma',
+    zhName: '菈乌玛',
+    elementColor: Color(0xFF64A038),
+    elementIconPath: 'assets/elements/dendro.png',
+  ),
+  Character(
+    enName: 'Nefer',
+    zhName: '奈芙尔',
+    elementColor: Color(0xFF64A038),
+    elementIconPath: 'assets/elements/dendro.png',
+  ),
+];
+
+/// 至冬角色数据，严格按英文名 A-Z 升序排列。
+const List<Character> _snezhnayaCharacters = <Character>[
+  Character(
+    enName: 'Alyosha',
+    zhName: '阿罗夏',
+    elementColor: Color(0xFF6957C2),
+    elementIconPath: 'assets/elements/electro.png',
+  ),
+  Character(
+    enName: 'Anastasya',
+    zhName: '安娜丝塔夏',
+    elementColor: Color(0xFF35AACC),
+    elementIconPath: 'assets/elements/cryo.png',
+  ),
+  Character(
+    enName: 'Danica',
+    zhName: '达妮卡',
+    elementColor: Color(0xFF6957C2),
+    elementIconPath: 'assets/elements/electro.png',
+  ),
+  Character(
+    enName: 'Mitya',
+    zhName: '米提亚',
+    elementColor: Color(0xFF6957C2),
+    elementIconPath: 'assets/elements/electro.png',
+  ),
+  // TODO: 待补充诺伊的元素和颜色
+  Character(
+    enName: 'Noy',
+    zhName: '诺伊',
+    elementColor: Colors.grey,
+    elementIconPath: 'assets/elements/cryo.png',
+  ),
+  Character(
+    enName: 'Odette',
+    zhName: '奥黛塔',
+    elementColor: Color(0xFF35AACC),
+    elementIconPath: 'assets/elements/cryo.png',
+  ),
+  Character(
+    enName: 'Valeriy',
+    zhName: '瓦列里',
+    elementColor: Color(0xFF6957C2),
+    elementIconPath: 'assets/elements/electro.png',
+  ),
+  Character(
+    enName: 'Vesna',
+    zhName: '薇斯纳',
+    elementColor: Color(0xFF359697),
+    elementIconPath: 'assets/elements/anemo.png',
+  ),
+  Character(
+    enName: 'Vodyanitsa',
+    zhName: '沃雅妮莎',
+    elementColor: Color(0xFF498FCC),
+    elementIconPath: 'assets/elements/hydro.png',
+  ),
+];
+
 /// 国家名 → 角色列表。
 ///
 /// 表头标题和“XX 位”都直接使用这里的查询结果，新增国家时只需继续补充条目。
@@ -293,6 +750,12 @@ const Map<String, List<Character>> _charactersByCountry =
     <String, List<Character>>{
       '蒙德': _mondstadtCharacters,
       '璃月': _liyueCharacters,
+      '稻妻': _inazumaCharacters,
+      '须弥': _sumeruCharacters,
+      '枫丹': _fontaineCharacters,
+      '纳塔': _natlanCharacters,
+      '挪德卡莱': _nodKraiCharacters,
+      '至冬': _snezhnayaCharacters,
     };
 
 /// 根据国家名返回对应的角色名单，未实现的国家返回空列表。
