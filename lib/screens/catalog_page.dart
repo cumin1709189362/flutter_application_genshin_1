@@ -24,46 +24,14 @@ class _Nation {
 /// TODO: 下面每个 Color 都是占位用的“淡彩”主题色，
 /// 后续替换具体 Hex 值时只需修改对应行即可。
 const List<_Nation> _nations = <_Nation>[
-  _Nation(
-    nameZh: '蒙德',
-    nameEn: 'Mondstadt',
-    color: Color(0xFF359697), 
-  ),
-  _Nation(
-    nameZh: '璃月',
-    nameEn: 'Liyue',
-    color: Color(0xFFCC9046), 
-  ),
-  _Nation(
-    nameZh: '稻妻',
-    nameEn: 'Inazuma',
-    color: Color(0xFF6957C2), 
-  ),
-  _Nation(
-    nameZh: '须弥',
-    nameEn: 'Sumeru',
-    color: Color(0xFF66AD16), 
-  ),
-  _Nation(
-    nameZh: '枫丹',
-    nameEn: 'Fontaine',
-    color: Color(0xFF498FCC), 
-  ),
-  _Nation(
-    nameZh: '纳塔',
-    nameEn: 'Natlan',
-    color: Color(0xFFEC4923), 
-  ),
-  _Nation(
-    nameZh: '挪德卡莱',
-    nameEn: 'Nod-Krai',
-    color: Color(0xFFC7B8E8), 
-  ),
-  _Nation(
-    nameZh: '至冬',
-    nameEn: 'Snezhnaya',
-    color: Color(0xFF35AACC), 
-  ),
+  _Nation(nameZh: '蒙德', nameEn: 'Mondstadt', color: Color(0xFF359697)),
+  _Nation(nameZh: '璃月', nameEn: 'Liyue', color: Color(0xFFCC9046)),
+  _Nation(nameZh: '稻妻', nameEn: 'Inazuma', color: Color(0xFF6957C2)),
+  _Nation(nameZh: '须弥', nameEn: 'Sumeru', color: Color(0xFF66AD16)),
+  _Nation(nameZh: '枫丹', nameEn: 'Fontaine', color: Color(0xFF498FCC)),
+  _Nation(nameZh: '纳塔', nameEn: 'Natlan', color: Color(0xFFEC4923)),
+  _Nation(nameZh: '挪德卡莱', nameEn: 'Nod-Krai', color: Color(0xFFC7B8E8)),
+  _Nation(nameZh: '至冬', nameEn: 'Snezhnaya', color: Color(0xFF35AACC)),
 ];
 
 /// 目录页：双列黄金比例网格，展示八个国家入口。
@@ -72,7 +40,7 @@ class CatalogPage extends StatelessWidget {
 
   static const double _gap = 10.0;
 
-  void _openCharacterList(BuildContext context) {
+  void _openCharacterList(BuildContext context, _Nation nation) {
     // 转场进行中时防止重复推入页面。
     final ModalRoute<dynamic>? currentRoute = ModalRoute.of(context);
     if (currentRoute != null && !currentRoute.isCurrent) {
@@ -86,16 +54,39 @@ class CatalogPage extends StatelessWidget {
         transitionDuration: const Duration(milliseconds: 650),
         reverseTransitionDuration: const Duration(milliseconds: 420),
         pageBuilder: (context, animation, secondaryAnimation) {
-          return const CharacterListPage();
+          return CharacterListPage(countryName: nation.nameZh);
         },
         transitionsBuilder: (context, animation, secondaryAnimation, child) {
-          // 新页面淡入；目录页自身的“放大 + 淡出”由本路由的
-          // secondaryAnimation 在 home_page.dart 中统一处理。
+          // 角色列表页淡入。
           final Animation<double> fadeIn = CurvedAnimation(
             parent: animation,
             curve: Curves.easeInOut,
           );
-          return FadeTransition(opacity: fadeIn, child: child);
+
+          // 详情页压栈时（secondaryAnimation 0 → 1），角色列表页
+          // 放大至全屏并逐渐淡出，形成“进入角色”的纵深感。
+          final Animation<double> scaleUp = Tween<double>(begin: 1.0, end: 1.18)
+              .animate(
+                CurvedAnimation(
+                  parent: secondaryAnimation,
+                  curve: Curves.easeInOutCubic,
+                ),
+              );
+          final Animation<double> fadeOut = Tween<double>(begin: 1.0, end: 0.0)
+              .animate(
+                CurvedAnimation(
+                  parent: secondaryAnimation,
+                  curve: Curves.easeInOut,
+                ),
+              );
+
+          return FadeTransition(
+            opacity: fadeIn,
+            child: ScaleTransition(
+              scale: scaleUp,
+              child: FadeTransition(opacity: fadeOut, child: child),
+            ),
+          );
         },
       ),
     );
@@ -158,7 +149,7 @@ class CatalogPage extends StatelessWidget {
                     tint: nation.color,
                     borderRadius: 22,
                     padding: const EdgeInsets.fromLTRB(16, 14, 16, 15),
-                    onTap: () => _openCharacterList(context),
+                    onTap: () => _openCharacterList(context, nation),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: <Widget>[

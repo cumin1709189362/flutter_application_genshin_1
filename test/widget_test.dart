@@ -55,6 +55,31 @@ void main() {
     await tester.pump(const Duration(milliseconds: 900));
 
     expect(find.text('角色列表'), findsOneWidget);
+    expect(find.text('Albedo'), findsOneWidget);
+    expect(find.text('阿贝多'), findsOneWidget);
+    expect(find.text('Amber'), findsOneWidget);
+
+    // 第一行 Albedo 应排在 Amber 上方，确认列表按英文名 A-Z 升序。
+    expect(
+      tester.getTopLeft(find.text('Albedo')).dy,
+      lessThan(tester.getTopLeft(find.text('Amber')).dy),
+    );
+
+    // 点击角色进入详情页。
+    await tester.tap(find.text('Albedo'));
+    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 900));
+
+    expect(find.text('阿贝多'), findsOneWidget);
+    expect(find.text('ALBEDO'), findsOneWidget);
+    expect(find.text('角色列表'), findsNothing);
+
+    // 从详情页返回角色列表。
+    await tester.tap(find.byType(BackButton));
+    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 900));
+
+    expect(find.text('Albedo'), findsOneWidget);
 
     await tester.tap(find.byType(BackButton));
     await tester.pump();
