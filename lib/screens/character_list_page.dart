@@ -148,15 +148,156 @@ const List<Character> _mondstadtCharacters = <Character>[
   ),
 ];
 
-/// 根据国家名返回对应的角色名单。
+/// 璃月角色数据，严格按英文名 A-Z 升序排列。
 ///
-/// 目前只实现蒙德；其他国家会展示“资料整理中”的空状态，
-/// 后续在这里补充分支即可扩展。
+/// 注意：按英文名比较，`Xiangling` 应排在 `Xianyun` 之前。
+const List<Character> _liyueCharacters = <Character>[
+  Character(
+    enName: 'Baizhu',
+    zhName: '白术',
+    elementColor: Color(0xFF64A038),
+    elementIconPath: 'assets/elements/dendro.png',
+  ),
+  Character(
+    enName: 'Beidou',
+    zhName: '北斗',
+    elementColor: Color(0xFF6957C2),
+    elementIconPath: 'assets/elements/electro.png',
+  ),
+  Character(
+    enName: 'Chongyun',
+    zhName: '重云',
+    elementColor: Color(0xFF35AACC),
+    elementIconPath: 'assets/elements/cryo.png',
+  ),
+  Character(
+    enName: 'Gaming',
+    zhName: '嘉明',
+    elementColor: Color(0xFFEC4923),
+    elementIconPath: 'assets/elements/pyro.png',
+  ),
+  Character(
+    enName: 'Ganyu',
+    zhName: '甘雨',
+    elementColor: Color(0xFF35AACC),
+    elementIconPath: 'assets/elements/cryo.png',
+  ),
+  Character(
+    enName: 'Hu Tao',
+    zhName: '胡桃',
+    elementColor: Color(0xFFEC4923),
+    elementIconPath: 'assets/elements/pyro.png',
+  ),
+  Character(
+    enName: 'Keqing',
+    zhName: '刻晴',
+    elementColor: Color(0xFF6957C2),
+    elementIconPath: 'assets/elements/electro.png',
+  ),
+  Character(
+    enName: 'Lan Yan',
+    zhName: '蓝砚',
+    elementColor: Color(0xFF359697),
+    elementIconPath: 'assets/elements/anemo.png',
+  ),
+  Character(
+    enName: 'Ningguang',
+    zhName: '凝光',
+    elementColor: Color(0xFFCC9046),
+    elementIconPath: 'assets/elements/geo.png',
+  ),
+  Character(
+    enName: 'Qiqi',
+    zhName: '七七',
+    elementColor: Color(0xFF35AACC),
+    elementIconPath: 'assets/elements/cryo.png',
+  ),
+  Character(
+    enName: 'Shenhe',
+    zhName: '申鹤',
+    elementColor: Color(0xFF35AACC),
+    elementIconPath: 'assets/elements/cryo.png',
+  ),
+  Character(
+    enName: 'Xiangling',
+    zhName: '香菱',
+    elementColor: Color(0xFFEC4923),
+    elementIconPath: 'assets/elements/pyro.png',
+  ),
+  Character(
+    enName: 'Xianyun',
+    zhName: '闲云',
+    elementColor: Color(0xFF359697),
+    elementIconPath: 'assets/elements/anemo.png',
+  ),
+  Character(
+    enName: 'Xiao',
+    zhName: '魈',
+    elementColor: Color(0xFF359697),
+    elementIconPath: 'assets/elements/anemo.png',
+  ),
+  Character(
+    enName: 'Xingqiu',
+    zhName: '行秋',
+    elementColor: Color(0xFF498FCC),
+    elementIconPath: 'assets/elements/hydro.png',
+  ),
+  Character(
+    enName: 'Xinyan',
+    zhName: '辛焱',
+    elementColor: Color(0xFFEC4923),
+    elementIconPath: 'assets/elements/pyro.png',
+  ),
+  Character(
+    enName: 'Yanfei',
+    zhName: '烟绯',
+    elementColor: Color(0xFFEC4923),
+    elementIconPath: 'assets/elements/pyro.png',
+  ),
+  Character(
+    enName: 'Yaoyao',
+    zhName: '瑶瑶',
+    elementColor: Color(0xFF64A038),
+    elementIconPath: 'assets/elements/dendro.png',
+  ),
+  Character(
+    enName: 'Yelan',
+    zhName: '夜兰',
+    elementColor: Color(0xFF498FCC),
+    elementIconPath: 'assets/elements/hydro.png',
+  ),
+  Character(
+    enName: 'Yun Jin',
+    zhName: '云堇',
+    elementColor: Color(0xFFCC9046),
+    elementIconPath: 'assets/elements/geo.png',
+  ),
+  Character(
+    enName: 'Zhongli',
+    zhName: '钟离',
+    elementColor: Color(0xFFCC9046),
+    elementIconPath: 'assets/elements/geo.png',
+  ),
+  Character(
+    enName: 'Zibai',
+    zhName: '兹白',
+    elementColor: Color(0xFFCC9046),
+    elementIconPath: 'assets/elements/geo.png',
+  ),
+];
+
+/// 国家名 → 角色列表。
+///
+/// 表头标题和“XX 位”都直接使用这里的查询结果，新增国家时只需继续补充条目。
+const Map<String, List<Character>> _charactersByCountry =
+    <String, List<Character>>{
+      '蒙德': _mondstadtCharacters,
+      '璃月': _liyueCharacters,
+    };
+
+/// 根据国家名返回对应的角色名单，未实现的国家返回空列表。
 List<Character> _charactersFor(String countryName) {
-  if (countryName == '蒙德') {
-    return _mondstadtCharacters;
-  }
-  return const <Character>[];
+  return _charactersByCountry[countryName] ?? const <Character>[];
 }
 
 /// 将英文名转换为 Title Case（首字母大写、其余小写）。
@@ -182,6 +323,12 @@ String _toTitleCase(String value) {
 /// 点击任意角色会以“列表放大淡出 + 详情页淡入”的转场进入详情页。
 class CharacterListPage extends StatelessWidget {
   const CharacterListPage({super.key, required this.countryName});
+
+  /// 悬浮玻璃表头内容区的高度（不含状态栏安全区）。
+  static const double _headerHeight = 64.0;
+
+  /// 列表顶部与表头底部之间的呼吸间距。
+  static const double _headerListGap = 8.0;
 
   /// 上一页（国家目录）传入的国家名，例如“蒙德”。
   final String countryName;
@@ -228,99 +375,147 @@ class CharacterListPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final List<Character> characters = _charactersFor(countryName);
+    final EdgeInsets padding = MediaQuery.paddingOf(context);
+    final double topInset = padding.top;
+    final double bottomInset = padding.bottom;
+    final double listTopPadding = topInset + _headerHeight + _headerListGap;
 
     return Scaffold(
       backgroundColor: Colors.black,
       body: AuroraBackground(
-        child: SafeArea(
-          child: Column(
-            children: <Widget>[
-              _buildHeader(characters.length),
-              Expanded(
-                child: characters.isEmpty
-                    ? _buildEmptyState()
-                    : ListView.builder(
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 16,
-                          vertical: 8,
-                        ),
-                        itemCount: characters.length,
-                        itemBuilder: (context, index) {
-                          final Character character = characters[index];
-                          return Padding(
-                            // 水平 16 已由列表 padding 提供，这里补足垂直 8。
-                            padding: const EdgeInsets.symmetric(vertical: 8),
-                            child: _CharacterGlassTile(
-                              character: character,
-                              onTap: () =>
-                                  _openCharacterDetail(context, character),
-                            ),
-                          );
-                        },
+        // 列表在下、悬浮表头在上，滚动内容会从玻璃表头后面隐约透出。
+        child: Stack(
+          children: <Widget>[
+            Positioned.fill(
+              child: characters.isEmpty
+                  ? Padding(
+                      padding: EdgeInsets.only(
+                        top: topInset + _headerHeight + _headerListGap,
                       ),
-              ),
-            ],
-          ),
+                      child: _buildEmptyState(),
+                    )
+                  : ListView.builder(
+                      padding: EdgeInsets.fromLTRB(
+                        16 + padding.left,
+                        listTopPadding,
+                        16 + padding.right,
+                        16 + bottomInset,
+                      ),
+                      // 保持列表项状态并为每一项建立独立重绘边界，
+                      // 配合表头的 BackdropFilter，滚动时减少不必要的重建和重绘。
+                      addAutomaticKeepAlives: true,
+                      addRepaintBoundaries: true,
+                      itemCount: characters.length,
+                      itemBuilder: (context, index) {
+                        final Character character = characters[index];
+                        return Padding(
+                          // 水平 16 已由列表 padding 提供，这里补足垂直 8。
+                          padding: const EdgeInsets.symmetric(vertical: 8),
+                          child: _CharacterGlassTile(
+                            character: character,
+                            onTap: () =>
+                                _openCharacterDetail(context, character),
+                          ),
+                        );
+                      },
+                    ),
+            ),
+            Positioned(
+              top: 0,
+              left: 0,
+              right: 0,
+              child: _buildHeader(characters.length),
+            ),
+          ],
         ),
       ),
     );
   }
 
-  /// 顶部返回按钮 + 国家标题。
+  /// 悬浮液态玻璃表头：返回按钮 + 国家标题 + 角色数量。
+  ///
+  /// 背景延伸到状态栏下方，内容由 [SafeArea] 保护，避免和系统状态栏重叠。
   Widget _buildHeader(int characterCount) {
-    return Padding(
-      padding: const EdgeInsets.fromLTRB(4, 4, 20, 4),
-      child: Row(
-        children: <Widget>[
-          const BackButton(color: Colors.white),
-          const SizedBox(width: 4),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: <Widget>[
-                Text(
-                  countryName,
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                  style: TextStyle(
-                    color: Colors.white,
-                    fontSize: 25,
-                    fontWeight: FontWeight.w500,
-                    height: 1.1,
-                    letterSpacing: 4,
-                    shadows: <Shadow>[
-                      Shadow(
-                        color: Colors.white.withValues(alpha: 0.45),
-                        blurRadius: 18,
+    return Listener(
+      // 表头是悬浮层，吸收空白区域的点击，避免误触到被遮住的列表项。
+      behavior: HitTestBehavior.opaque,
+      child: ClipRect(
+        child: BackdropFilter(
+          filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
+          child: Container(
+            decoration: BoxDecoration(
+              color: Colors.black.withValues(alpha: 0.35),
+              border: Border(
+                bottom: BorderSide(
+                  color: Colors.white.withValues(alpha: 0.12),
+                  width: 1,
+                ),
+              ),
+            ),
+            child: SafeArea(
+              bottom: false,
+              child: SizedBox(
+                height: _headerHeight,
+                child: Padding(
+                  padding: const EdgeInsets.fromLTRB(4, 0, 20, 0),
+                  child: Row(
+                    children: <Widget>[
+                      const BackButton(color: Colors.white),
+                      const SizedBox(width: 4),
+                      Expanded(
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: <Widget>[
+                            Text(
+                              countryName,
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                              style: TextStyle(
+                                color: Colors.white,
+                                fontSize: 25,
+                                fontWeight: FontWeight.w500,
+                                height: 1.1,
+                                letterSpacing: 4,
+                                shadows: <Shadow>[
+                                  Shadow(
+                                    color: Colors.white.withValues(alpha: 0.45),
+                                    blurRadius: 18,
+                                  ),
+                                ],
+                              ),
+                            ),
+                            const SizedBox(height: 4),
+                            Text(
+                              '角色列表',
+                              style: TextStyle(
+                                color: Colors.white.withValues(alpha: 0.52),
+                                fontSize: 10,
+                                fontWeight: FontWeight.w400,
+                                height: 1.0,
+                                letterSpacing: 4,
+                              ),
+                            ),
+                          ],
+                        ),
                       ),
+                      if (characterCount > 0)
+                        Text(
+                          '$characterCount 位',
+                          style: TextStyle(
+                            color: Colors.white.withValues(alpha: 0.45),
+                            fontSize: 11,
+                            fontWeight: FontWeight.w400,
+                            letterSpacing: 1.5,
+                          ),
+                        ),
                     ],
                   ),
                 ),
-                const SizedBox(height: 4),
-                Text(
-                  '角色列表',
-                  style: TextStyle(
-                    color: Colors.white.withValues(alpha: 0.52),
-                    fontSize: 10,
-                    fontWeight: FontWeight.w400,
-                    height: 1.0,
-                    letterSpacing: 4,
-                  ),
-                ),
-              ],
-            ),
-          ),
-          if (characterCount > 0)
-            Text(
-              '$characterCount 位',
-              style: TextStyle(
-                color: Colors.white.withValues(alpha: 0.45),
-                fontSize: 11,
-                fontWeight: FontWeight.w400,
-                letterSpacing: 1.5,
               ),
             ),
-        ],
+          ),
+        ),
       ),
     );
   }

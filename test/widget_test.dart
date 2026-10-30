@@ -56,6 +56,7 @@ void main() {
     await tester.pump(const Duration(milliseconds: 900));
 
     expect(find.text('角色列表'), findsOneWidget);
+    expect(find.text('23 位'), findsOneWidget);
     expect(find.text('Albedo'), findsOneWidget);
     expect(find.text('阿贝多'), findsOneWidget);
     expect(find.text('Amber'), findsOneWidget);
@@ -109,6 +110,49 @@ void main() {
 
     expect(find.text('角色列表'), findsNothing);
     expect(find.text('蒙德'), findsOneWidget);
+  });
+
+  testWidgets('璃月列表显示 22 位角色并动态更新表头', (WidgetTester tester) async {
+    _usePhoneViewport(tester);
+    await tester.pumpWidget(const GenshinApp());
+    await tester.pump(const Duration(milliseconds: 300));
+
+    await tester.tap(find.text('→'));
+    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 900));
+
+    await tester.tap(find.text('璃月'));
+    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 900));
+
+    // 标题与数量都来自当前国家数据，而不是写死的蒙德。
+    expect(find.text('璃月'), findsOneWidget);
+    expect(find.text('蒙德'), findsNothing);
+    expect(find.text('22 位'), findsOneWidget);
+    expect(find.text('Baizhu'), findsOneWidget);
+    expect(find.text('白术'), findsOneWidget);
+    expect(find.text('Beidou'), findsOneWidget);
+    expect(find.text('北斗'), findsOneWidget);
+
+    expect(
+      tester.getTopLeft(find.text('Baizhu')).dy,
+      lessThan(tester.getTopLeft(find.text('Beidou')).dy),
+    );
+
+    // 严格按英文名排序时，Xiangling 应排在 Xianyun 之前。
+    await tester.scrollUntilVisible(
+      find.text('Xiangling'),
+      200,
+      scrollable: find.byType(Scrollable),
+    );
+    await tester.pump();
+
+    expect(find.text('Xiangling'), findsOneWidget);
+    expect(find.text('Xianyun'), findsOneWidget);
+    expect(
+      tester.getTopLeft(find.text('Xiangling')).dy,
+      lessThan(tester.getTopLeft(find.text('Xianyun')).dy),
+    );
   });
 
   testWidgets('七种元素图标资源均已声明且可读取', (WidgetTester tester) async {
