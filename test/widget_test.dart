@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 import 'package:flutter_application_genshin_1/main.dart';
@@ -65,6 +66,27 @@ void main() {
       lessThan(tester.getTopLeft(find.text('Amber')).dy),
     );
 
+    // 角色行应加载本地元素图标，Albedo 对应岩元素。
+    // Image.asset 指定 cacheWidth 后，provider 会被 ResizeImage 包装。
+    final Iterable<Image> characterIcons = tester.widgetList<Image>(
+      find.byType(Image),
+    );
+    expect(
+      characterIcons.any((Image image) {
+        final ImageProvider<Object> provider = image.image;
+        if (provider is AssetImage) {
+          return provider.assetName == 'assets/elements/geo.png';
+        }
+        if (provider is ResizeImage) {
+          final ImageProvider<Object> resized = provider.imageProvider;
+          return resized is AssetImage &&
+              resized.assetName == 'assets/elements/geo.png';
+        }
+        return false;
+      }),
+      isTrue,
+    );
+
     // 点击角色进入详情页。
     await tester.tap(find.text('Albedo'));
     await tester.pump();
@@ -87,5 +109,22 @@ void main() {
 
     expect(find.text('角色列表'), findsNothing);
     expect(find.text('蒙德'), findsOneWidget);
+  });
+
+  testWidgets('七种元素图标资源均已声明且可读取', (WidgetTester tester) async {
+    const List<String> elementNames = <String>[
+      'anemo',
+      'geo',
+      'electro',
+      'dendro',
+      'hydro',
+      'pyro',
+      'cryo',
+    ];
+
+    for (final String element in elementNames) {
+      final data = await rootBundle.load('assets/elements/$element.png');
+      expect(data.lengthInBytes, greaterThan(0));
+    }
   });
 }

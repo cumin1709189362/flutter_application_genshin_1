@@ -39,7 +39,7 @@ class GenshinApp extends StatelessWidget {
         brightness: Brightness.dark,
         scaffoldBackgroundColor: Colors.black,
         // ------------------------------------------------------------------
-        // TODO: 在这里配置原神字体 assets 并在 pubspec.yaml 引入
+        // alreadyTODO: 在这里配置原神字体 assets 并在 pubspec.yaml 引入
         //
         // 1. 将字体文件放到 assets/fonts/ 目录（例如 GenshinFont-Regular.ttf）；
         // 2. 在 pubspec.yaml 的 flutter.fonts 中声明：

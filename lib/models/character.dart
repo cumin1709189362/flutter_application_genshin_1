@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 
 /// 原神角色数据模型。
 ///
-/// 目前列表页只需要展示中英文名与元素主题色，
+/// 目前列表页只需要展示中英文名、元素主题色与元素图标，
 /// 后续的立绘、神之眼、命之座等信息可以继续在这里扩展字段。
 @immutable
 class Character {
@@ -10,6 +10,7 @@ class Character {
     required this.enName,
     required this.zhName,
     required this.elementColor,
+    required this.elementIconPath,
   });
 
   /// 英文名，用于列表左侧展示以及 A-Z 排序。
@@ -20,4 +21,7 @@ class Character {
 
   /// 元素标准色，会在列表里转为 20% 透明度作为玻璃底色。
   final Color elementColor;
+
+  /// 元素图标的本地资源路径，例如 `assets/elements/anemo.png`。
+  final String elementIconPath;
 }

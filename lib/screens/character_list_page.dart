@@ -8,29 +8,144 @@ import 'character_detail_page.dart';
 
 /// 蒙德角色数据，严格按英文名 A-Z 升序排列。
 const List<Character> _mondstadtCharacters = <Character>[
-  Character(enName: 'Albedo', zhName: '阿贝多', elementColor: Color(0xFFCC9046)),
-  Character(enName: 'Amber', zhName: '安柏', elementColor: Color(0xFFEC4923)),
-  Character(enName: 'Barbara', zhName: '芭芭拉', elementColor: Color(0xFF498FCC)),
-  Character(enName: 'Bennett', zhName: '班尼特', elementColor: Color(0xFFEC4923)),
-  Character(enName: 'Dahlia', zhName: '塔利雅', elementColor: Color(0xFF498FCC)),
-  Character(enName: 'Diluc', zhName: '迪卢克', elementColor: Color(0xFFEC4923)),
-  Character(enName: 'Diona', zhName: '迪奥娜', elementColor: Color(0xFF35AACC)),
-  Character(enName: 'Durin', zhName: '杜林', elementColor: Color(0xFFEC4923)),
-  Character(enName: 'Eula', zhName: '优菈', elementColor: Color(0xFF35AACC)),
-  Character(enName: 'Fischl', zhName: '菲谢尔', elementColor: Color(0xFF6957C2)),
-  Character(enName: 'Jean', zhName: '琴', elementColor: Color(0xFF359697)),
-  Character(enName: 'Kaeya', zhName: '凯亚', elementColor: Color(0xFF35AACC)),
-  Character(enName: 'Klee', zhName: '可莉', elementColor: Color(0xFFEC4923)),
-  Character(enName: 'Lisa', zhName: '丽莎', elementColor: Color(0xFF6957C2)),
-  Character(enName: 'Lohen', zhName: '洛恩', elementColor: Color(0xFF35AACC)),
-  Character(enName: 'Mika', zhName: '米卡', elementColor: Color(0xFF35AACC)),
-  Character(enName: 'Mona', zhName: '莫娜', elementColor: Color(0xFF498FCC)),
-  Character(enName: 'Noelle', zhName: '诺艾尔', elementColor: Color(0xFFCC9046)),
-  Character(enName: 'Razor', zhName: '雷泽', elementColor: Color(0xFF6957C2)),
-  Character(enName: 'Rosaria', zhName: '罗莎莉亚', elementColor: Color(0xFF35AACC)),
-  Character(enName: 'Sucrose', zhName: '砂糖', elementColor: Color(0xFF359697)),
-  Character(enName: 'Varka', zhName: '法尔伽', elementColor: Color(0xFF359697)),
-  Character(enName: 'Venti', zhName: '温迪', elementColor: Color(0xFF359697)),
+  Character(
+    enName: 'Albedo',
+    zhName: '阿贝多',
+    elementColor: Color(0xFFCC9046),
+    elementIconPath: 'assets/elements/geo.png',
+  ),
+  Character(
+    enName: 'Amber',
+    zhName: '安柏',
+    elementColor: Color(0xFFEC4923),
+    elementIconPath: 'assets/elements/pyro.png',
+  ),
+  Character(
+    enName: 'Barbara',
+    zhName: '芭芭拉',
+    elementColor: Color(0xFF498FCC),
+    elementIconPath: 'assets/elements/hydro.png',
+  ),
+  Character(
+    enName: 'Bennett',
+    zhName: '班尼特',
+    elementColor: Color(0xFFEC4923),
+    elementIconPath: 'assets/elements/pyro.png',
+  ),
+  Character(
+    enName: 'Dahlia',
+    zhName: '塔利雅',
+    elementColor: Color(0xFF498FCC),
+    elementIconPath: 'assets/elements/hydro.png',
+  ),
+  Character(
+    enName: 'Diluc',
+    zhName: '迪卢克',
+    elementColor: Color(0xFFEC4923),
+    elementIconPath: 'assets/elements/pyro.png',
+  ),
+  Character(
+    enName: 'Diona',
+    zhName: '迪奥娜',
+    elementColor: Color(0xFF35AACC),
+    elementIconPath: 'assets/elements/cryo.png',
+  ),
+  Character(
+    enName: 'Durin',
+    zhName: '杜林',
+    elementColor: Color(0xFFEC4923),
+    elementIconPath: 'assets/elements/pyro.png',
+  ),
+  Character(
+    enName: 'Eula',
+    zhName: '优菈',
+    elementColor: Color(0xFF35AACC),
+    elementIconPath: 'assets/elements/cryo.png',
+  ),
+  Character(
+    enName: 'Fischl',
+    zhName: '菲谢尔',
+    elementColor: Color(0xFF6957C2),
+    elementIconPath: 'assets/elements/electro.png',
+  ),
+  Character(
+    enName: 'Jean',
+    zhName: '琴',
+    elementColor: Color(0xFF359697),
+    elementIconPath: 'assets/elements/anemo.png',
+  ),
+  Character(
+    enName: 'Kaeya',
+    zhName: '凯亚',
+    elementColor: Color(0xFF35AACC),
+    elementIconPath: 'assets/elements/cryo.png',
+  ),
+  Character(
+    enName: 'Klee',
+    zhName: '可莉',
+    elementColor: Color(0xFFEC4923),
+    elementIconPath: 'assets/elements/pyro.png',
+  ),
+  Character(
+    enName: 'Lisa',
+    zhName: '丽莎',
+    elementColor: Color(0xFF6957C2),
+    elementIconPath: 'assets/elements/electro.png',
+  ),
+  Character(
+    enName: 'Lohen',
+    zhName: '洛恩',
+    elementColor: Color(0xFF35AACC),
+    elementIconPath: 'assets/elements/cryo.png',
+  ),
+  Character(
+    enName: 'Mika',
+    zhName: '米卡',
+    elementColor: Color(0xFF35AACC),
+    elementIconPath: 'assets/elements/cryo.png',
+  ),
+  Character(
+    enName: 'Mona',
+    zhName: '莫娜',
+    elementColor: Color(0xFF498FCC),
+    elementIconPath: 'assets/elements/hydro.png',
+  ),
+  Character(
+    enName: 'Noelle',
+    zhName: '诺艾尔',
+    elementColor: Color(0xFFCC9046),
+    elementIconPath: 'assets/elements/geo.png',
+  ),
+  Character(
+    enName: 'Razor',
+    zhName: '雷泽',
+    elementColor: Color(0xFF6957C2),
+    elementIconPath: 'assets/elements/electro.png',
+  ),
+  Character(
+    enName: 'Rosaria',
+    zhName: '罗莎莉亚',
+    elementColor: Color(0xFF35AACC),
+    elementIconPath: 'assets/elements/cryo.png',
+  ),
+  Character(
+    enName: 'Sucrose',
+    zhName: '砂糖',
+    elementColor: Color(0xFF359697),
+    elementIconPath: 'assets/elements/anemo.png',
+  ),
+  Character(
+    enName: 'Varka',
+    zhName: '法尔伽',
+    elementColor: Color(0xFF359697),
+    elementIconPath: 'assets/elements/anemo.png',
+  ),
+  Character(
+    enName: 'Venti',
+    zhName: '温迪',
+    elementColor: Color(0xFF359697),
+    elementIconPath: 'assets/elements/anemo.png',
+  ),
 ];
 
 /// 根据国家名返回对应的角色名单。
@@ -350,17 +465,47 @@ class _CharacterGlassTileState extends State<_CharacterGlassTile> {
                         ),
                       ),
                       const SizedBox(width: 16),
-                      Text(
-                        character.zhName,
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                        style: const TextStyle(
-                          color: Colors.white,
-                          fontSize: 17,
-                          fontWeight: FontWeight.w500,
-                          height: 1.2,
-                          letterSpacing: 2.0,
-                        ),
+                      Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: <Widget>[
+                          Text(
+                            character.zhName,
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                            style: const TextStyle(
+                              color: Colors.white,
+                              fontSize: 17,
+                              fontWeight: FontWeight.w500,
+                              height: 1.2,
+                              letterSpacing: 2.0,
+                            ),
+                          ),
+                          const SizedBox(width: 12),
+                          // 用 Container 的 boxShadow 给透明 PNG 图标叠加一圈
+                          // 极淡的白色柔光，避免光晕盖过图标本身的细节。
+                          Container(
+                            decoration: BoxDecoration(
+                              shape: BoxShape.circle,
+                              boxShadow: <BoxShadow>[
+                                BoxShadow(
+                                  color: Colors.white.withValues(alpha: 0.2),
+                                  blurRadius: 4,
+                                  spreadRadius: 0.5,
+                                ),
+                              ],
+                            ),
+                            child: Image.asset(
+                              character.elementIconPath,
+                              width: 24,
+                              height: 24,
+                              fit: BoxFit.contain,
+                              // 原始图标约 3000px 宽，按 24dp 显示时只需解码到 96px，
+                              // 避免几张超大 PNG 占满 ImageCache。
+                              cacheWidth: 96,
+                              excludeFromSemantics: true,
+                            ),
+                          ),
+                        ],
                       ),
                     ],
                   ),
