@@ -1108,17 +1108,21 @@ class _CharacterGlassTileState extends State<_CharacterGlassTile> {
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: <Widget>[
-                      Flexible(
-                        child: Text(
-                          _toTitleCase(character.enName),
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis,
-                          style: const TextStyle(
-                            color: Colors.white,
-                            fontSize: 18,
-                            fontWeight: FontWeight.w500,
-                            height: 1.2,
-                            letterSpacing: 1.2,
+                      Expanded(
+                        child: FittedBox(
+                          fit: BoxFit.scaleDown,
+                          alignment: Alignment.centerLeft,
+                          child: Text(
+                            _toTitleCase(character.enName),
+                            maxLines: 1,
+                            softWrap: false,
+                            style: const TextStyle(
+                              color: Colors.white,
+                              fontSize: 18,
+                              fontWeight: FontWeight.w500,
+                              height: 1.2,
+                              letterSpacing: 1.2,
+                            ),
                           ),
                         ),
                       ),

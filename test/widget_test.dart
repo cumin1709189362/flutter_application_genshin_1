@@ -189,6 +189,37 @@ void main() {
     }
   });
 
+  testWidgets('长英文名通过 FittedBox 完整缩放显示', (WidgetTester tester) async {
+    _usePhoneViewport(tester);
+    await tester.pumpWidget(const GenshinApp());
+    await tester.pump(const Duration(milliseconds: 300));
+
+    await tester.tap(find.text('→'));
+    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 900));
+
+    await tester.tap(find.text('稻妻'));
+    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 900));
+
+    final Finder longName = find.text('Kaedehara Kazuha');
+    expect(longName, findsOneWidget);
+
+    final Text text = tester.widget<Text>(longName);
+    expect(text.style?.fontSize, 18);
+    expect(text.overflow, isNot(TextOverflow.ellipsis));
+
+    final Finder fittedBoxFinder = find.ancestor(
+      of: longName,
+      matching: find.byType(FittedBox),
+    );
+    expect(fittedBoxFinder, findsOneWidget);
+
+    final FittedBox fittedBox = tester.widget<FittedBox>(fittedBoxFinder);
+    expect(fittedBox.fit, BoxFit.scaleDown);
+    expect(fittedBox.alignment, Alignment.centerLeft);
+  });
+
   testWidgets('七种元素图标资源均已声明且可读取', (WidgetTester tester) async {
     const List<String> elementNames = <String>[
       'anemo',
