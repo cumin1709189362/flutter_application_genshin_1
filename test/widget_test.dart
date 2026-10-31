@@ -169,10 +169,10 @@ void main() {
       '璃月': '22 位',
       '稻妻': '17 位',
       '须弥': '14 位',
-      '枫丹': '14 位',
+      '枫丹': '15 位',
       '纳塔': '11 位',
       '挪德卡莱': '10 位',
-      '至冬': '10 位',
+      '至冬': '11 位',
     };
 
     for (final MapEntry<String, String> entry in expectedCounts.entries) {

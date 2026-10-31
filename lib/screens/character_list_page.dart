@@ -489,6 +489,12 @@ const List<Character> _sumeruCharacters = <Character>[
 /// 枫丹角色数据，严格按英文名 A-Z 升序排列。
 const List<Character> _fontaineCharacters = <Character>[
   Character(
+    enName: 'Arlecchino',
+    zhName: '阿蕾奇诺',
+    elementColor: Color(0xFFEC4923),
+    elementIconPath: 'assets/elements/pyro.png',
+  ),
+  Character(
     enName: 'Charlotte',
     zhName: '夏洛蒂',
     elementColor: Color(0xFF35AACC),
@@ -752,6 +758,12 @@ const List<Character> _snezhnayaCharacters = <Character>[
     zhName: '桑多涅',
     elementColor: Color(0xFF35AACC),
     elementIconPath: 'assets/elements/cryo.png',
+  ),
+  Character(
+    enName: 'Tartaglia',
+    zhName: '达达利亚',
+    elementColor: Color(0xFF498FCC),
+    elementIconPath: 'assets/elements/hydro.png',
   ),
   Character(
     enName: 'Valeriy',
