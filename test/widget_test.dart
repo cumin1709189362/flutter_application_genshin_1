@@ -3,6 +3,8 @@ import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 import 'package:flutter_application_genshin_1/main.dart';
+import 'package:flutter_application_genshin_1/models/character.dart';
+import 'package:flutter_application_genshin_1/screens/character_detail_page.dart';
 
 /// 使用手机竖屏尺寸，避免测试默认的 800x600 横屏视口
 /// 让目录页的双列黄金比例卡片变得过高而溢出。
@@ -88,17 +90,26 @@ void main() {
       isTrue,
     );
 
-    // 点击角色进入详情页。
+    // 点击角色进入详情页，故事异步加载完成后应展示纯文本内容。
     await tester.tap(find.text('Albedo'));
     await tester.pump();
     await tester.pump(const Duration(milliseconds: 900));
 
-    expect(find.text('阿贝多'), findsOneWidget);
-    expect(find.text('ALBEDO'), findsOneWidget);
+    expect(
+      find.byKey(const Key('character-detail-back-button')),
+      findsOneWidget,
+    );
+    expect(find.textContaining('角色详细'), findsOneWidget);
+    expect(find.text('ALBEDO'), findsNothing);
     expect(find.text('角色列表'), findsNothing);
 
-    // 从详情页返回角色列表。
-    await tester.tap(find.byType(BackButton));
+    final Text storyText = tester.widget<Text>(find.textContaining('角色详细'));
+    expect(storyText.data, isNotNull);
+    expect(storyText.data, isNot(contains('##')));
+    expect(storyText.data, isNot(contains('> 解锁条件')));
+
+    // 从详情页的悬浮玻璃按钮返回角色列表。
+    await tester.tap(find.byKey(const Key('character-detail-back-button')));
     await tester.pump();
     await tester.pump(const Duration(milliseconds: 900));
 
@@ -218,6 +229,30 @@ void main() {
     final FittedBox fittedBox = tester.widget<FittedBox>(fittedBoxFinder);
     expect(fittedBox.fit, BoxFit.scaleDown);
     expect(fittedBox.alignment, Alignment.centerLeft);
+  });
+
+  testWidgets('故事文件缺失时显示未收录提示', (WidgetTester tester) async {
+    _usePhoneViewport(tester);
+    await tester.pumpWidget(
+      MaterialApp(
+        home: CharacterDetailPage(
+          character: const Character(
+            enName: 'Missing',
+            zhName: '不存在的角色',
+            elementColor: Color(0xFF359697),
+            elementIconPath: 'assets/elements/anemo.png',
+          ),
+        ),
+      ),
+    );
+    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 500));
+
+    expect(find.text('故事未收录'), findsOneWidget);
+    expect(
+      find.byKey(const Key('character-detail-back-button')),
+      findsOneWidget,
+    );
   });
 
   testWidgets('七种元素图标资源均已声明且可读取', (WidgetTester tester) async {
