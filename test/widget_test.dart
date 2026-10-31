@@ -56,7 +56,7 @@ void main() {
     await tester.pump(const Duration(milliseconds: 900));
 
     expect(find.text('角色列表'), findsOneWidget);
-    expect(find.text('23 位'), findsOneWidget);
+    expect(find.text('24 位'), findsOneWidget);
     expect(find.text('Albedo'), findsOneWidget);
     expect(find.text('阿贝多'), findsOneWidget);
     expect(find.text('Amber'), findsOneWidget);
@@ -165,14 +165,14 @@ void main() {
     await tester.pump(const Duration(milliseconds: 900));
 
     const Map<String, String> expectedCounts = <String, String>{
-      '蒙德': '23 位',
+      '蒙德': '24 位',
       '璃月': '22 位',
       '稻妻': '17 位',
       '须弥': '14 位',
-      '枫丹': '13 位',
+      '枫丹': '14 位',
       '纳塔': '11 位',
-      '挪德卡莱': '8 位',
-      '至冬': '9 位',
+      '挪德卡莱': '10 位',
+      '至冬': '10 位',
     };
 
     for (final MapEntry<String, String> entry in expectedCounts.entries) {

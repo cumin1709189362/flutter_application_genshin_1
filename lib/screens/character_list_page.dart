@@ -117,6 +117,12 @@ const List<Character> _mondstadtCharacters = <Character>[
     elementIconPath: 'assets/elements/geo.png',
   ),
   Character(
+    enName: 'Prune',
+    zhName: '布伦妮',
+    elementColor: Color(0xFF359697),
+    elementIconPath: 'assets/elements/anemo.png',
+  ),
+  Character(
     enName: 'Razor',
     zhName: '雷泽',
     elementColor: Color(0xFF6957C2),
@@ -555,6 +561,12 @@ const List<Character> _fontaineCharacters = <Character>[
     elementIconPath: 'assets/elements/hydro.png',
   ),
   Character(
+    enName: 'Skirk',
+    zhName: '丝柯克',
+    elementColor: Color(0xFF35AACC),
+    elementIconPath: 'assets/elements/cryo.png',
+  ),
+  Character(
     enName: 'Wriothesley',
     zhName: '莱欧斯利',
     elementColor: Color(0xFF35AACC),
@@ -677,10 +689,22 @@ const List<Character> _nodKraiCharacters = <Character>[
     elementIconPath: 'assets/elements/dendro.png',
   ),
   Character(
+    enName: 'Linnea',
+    zhName: '莉奈娅',
+    elementColor: Color(0xFFCC9046),
+    elementIconPath: 'assets/elements/geo.png',
+  ),
+  Character(
     enName: 'Nefer',
     zhName: '奈芙尔',
     elementColor: Color(0xFF64A038),
     elementIconPath: 'assets/elements/dendro.png',
+  ),
+  Character(
+    enName: 'Nicole',
+    zhName: '尼可',
+    elementColor: Color(0xFFEC4923),
+    elementIconPath: 'assets/elements/pyro.png',
   ),
 ];
 
@@ -720,6 +744,12 @@ const List<Character> _snezhnayaCharacters = <Character>[
   Character(
     enName: 'Odette',
     zhName: '奥黛塔',
+    elementColor: Color(0xFF35AACC),
+    elementIconPath: 'assets/elements/cryo.png',
+  ),
+  Character(
+    enName: 'Sandrone',
+    zhName: '桑多涅',
     elementColor: Color(0xFF35AACC),
     elementIconPath: 'assets/elements/cryo.png',
   ),
