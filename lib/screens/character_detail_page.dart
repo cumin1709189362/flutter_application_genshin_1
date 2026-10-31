@@ -10,7 +10,6 @@ import '../widgets/aurora_background.dart';
 class CharacterDetailPage extends StatefulWidget {
   const CharacterDetailPage({super.key, required this.character});
 
-  /// 从角色列表页传入的角色数据。
   final Character character;
 
   @override
@@ -18,30 +17,24 @@ class CharacterDetailPage extends StatefulWidget {
 }
 
 class _CharacterDetailPageState extends State<CharacterDetailPage> {
-  static const double _horizontalPadding = 24.0;
-  static const double _topContentGap = 96.0;
-  static const double _bottomContentGap = 48.0;
+  static const double _horizontalPadding = 24;
+  static const double _topContentGap = 96;
+  static const double _bottomContentGap = 48;
+  static const String _dividerText = '-------------------------';
 
   late final Future<String> _storyFuture;
 
   @override
   void initState() {
     super.initState();
-    _storyFuture = _loadStory();
-  }
-
-  Future<String> _loadStory() async {
-    final String raw = await rootBundle.loadString(
+    _storyFuture = rootBundle.loadString(
       'assets/stories/${widget.character.zhName}.md',
     );
-    return _cleanMarkdown(raw);
   }
 
   @override
   Widget build(BuildContext context) {
-    final EdgeInsets viewPadding = MediaQuery.paddingOf(context);
-    final double topPadding = viewPadding.top + _topContentGap;
-    final double bottomPadding = viewPadding.bottom + _bottomContentGap;
+    final EdgeInsets safe = MediaQuery.paddingOf(context);
 
     return Scaffold(
       backgroundColor: Colors.black,
@@ -54,33 +47,32 @@ class _CharacterDetailPageState extends State<CharacterDetailPage> {
                 builder:
                     (BuildContext context, AsyncSnapshot<String> snapshot) {
                       if (snapshot.connectionState == ConnectionState.waiting) {
-                        return _buildLoadingState();
+                        return _buildLoading();
                       }
                       if (snapshot.hasError) {
-                        return _buildMessageState('故事未收录');
+                        return _buildMessage('故事未收录');
                       }
 
-                      final String story = (snapshot.data ?? '').trim();
-                      if (story.isEmpty) {
-                        return _buildMessageState('故事未收录');
+                      final String raw = snapshot.data ?? '';
+                      if (raw.trim().isEmpty) {
+                        return _buildMessage('故事未收录');
+                      }
+
+                      final List<Widget> blocks = _buildBlocks(raw);
+                      if (blocks.isEmpty) {
+                        return _buildMessage('故事未收录');
                       }
 
                       return SingleChildScrollView(
                         padding: EdgeInsets.fromLTRB(
                           _horizontalPadding,
-                          topPadding,
+                          safe.top + _topContentGap,
                           _horizontalPadding,
-                          bottomPadding,
+                          safe.bottom + _bottomContentGap,
                         ),
-                        child: Text(
-                          story,
-                          style: TextStyle(
-                            color: Colors.white.withValues(alpha: 0.9),
-                            fontSize: 16,
-                            fontWeight: FontWeight.w400,
-                            height: 1.8,
-                            letterSpacing: 0.5,
-                          ),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.stretch,
+                          children: blocks,
                         ),
                       );
                     },
@@ -106,7 +98,184 @@ class _CharacterDetailPageState extends State<CharacterDetailPage> {
     );
   }
 
-  Widget _buildLoadingState() {
+  List<Widget> _buildBlocks(String raw) {
+    final List<String> lines = raw
+        .replaceFirst('\uFEFF', '')
+        .replaceAll('\r\n', '\n')
+        .replaceAll('\r', '\n')
+        .split('\n');
+
+    final List<Widget> blocks = <Widget>[];
+    bool lastWasSpace = false;
+    bool skipBlank = false;
+
+    void addSpace() {
+      if (skipBlank || blocks.isEmpty || lastWasSpace) {
+        return;
+      }
+      blocks.add(const SizedBox(height: 16));
+      lastWasSpace = true;
+    }
+
+    for (final String rawLine in lines) {
+      if (_fencePattern.hasMatch(rawLine)) {
+        continue;
+      }
+      if (_rulePattern.hasMatch(rawLine)) {
+        addSpace();
+        continue;
+      }
+
+      final RegExpMatch? heading = _headingPattern.firstMatch(rawLine);
+      final int level = heading == null ? 0 : heading.group(1)!.length;
+      String line = heading == null ? rawLine : heading.group(2)!;
+
+      if (level == 0) {
+        line = line.replaceFirst(_quotePattern, '');
+        line = line.replaceFirst(_listPattern, '');
+      }
+
+      final String text = _stripInlineMarkdown(line);
+      if (text.isEmpty) {
+        addSpace();
+        continue;
+      }
+
+      skipBlank = false;
+      lastWasSpace = false;
+
+      if (level == 1) {
+        blocks.add(_buildCharacterName(text));
+      } else if (level >= 2) {
+        blocks.add(_buildDivider());
+        blocks.add(_buildSectionTitle(_localizeStoryTitle(text)));
+
+        // 角色故事标题与紧接其后的解锁条件之间不插入空行。
+        if (_storyNumber(text) != null) {
+          skipBlank = true;
+        }
+      } else if (text.startsWith('解锁条件')) {
+        blocks.add(_buildUnlockCondition(text));
+      } else if (text.startsWith('来源页面') || text.startsWith('来源：')) {
+        blocks.add(_buildSourceLine(text));
+      } else {
+        blocks.add(_buildParagraph(text));
+      }
+    }
+
+    if (blocks.isNotEmpty && blocks.last is SizedBox) {
+      blocks.removeLast();
+    }
+
+    return blocks;
+  }
+
+  Widget _buildCharacterName(String text) {
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 12),
+      child: Text(
+        text,
+        style: TextStyle(
+          color: Colors.white,
+          fontSize: 30,
+          fontWeight: FontWeight.w600,
+          height: 1.3,
+          letterSpacing: 4,
+          shadows: <Shadow>[
+            Shadow(
+              color: widget.character.elementColor.withValues(alpha: 0.45),
+              blurRadius: 24,
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildDivider() {
+    return Padding(
+      padding: const EdgeInsets.only(top: 20, bottom: 12),
+      child: Text(
+        _dividerText,
+        textAlign: TextAlign.center,
+        style: TextStyle(
+          color: Colors.grey.withValues(alpha: 0.5),
+          fontSize: 12,
+          height: 1.0,
+          letterSpacing: 1.2,
+        ),
+      ),
+    );
+  }
+
+  Widget _buildSectionTitle(String text) {
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 6),
+      child: Text(
+        text,
+        style: TextStyle(
+          color: Color.lerp(Colors.white, widget.character.elementColor, 0.35),
+          fontSize: 20,
+          fontWeight: FontWeight.w700,
+          height: 1.35,
+          letterSpacing: 2,
+          shadows: <Shadow>[
+            Shadow(
+              color: widget.character.elementColor.withValues(alpha: 0.38),
+              blurRadius: 18,
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildUnlockCondition(String text) {
+    return Padding(
+      padding: const EdgeInsets.only(top: 2, bottom: 14),
+      child: Text(
+        text,
+        style: const TextStyle(
+          color: Colors.white70,
+          fontSize: 14,
+          height: 1.5,
+          letterSpacing: 0.6,
+        ),
+      ),
+    );
+  }
+
+  Widget _buildSourceLine(String text) {
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 8),
+      child: Text(
+        text,
+        style: TextStyle(
+          color: Colors.white.withValues(alpha: 0.35),
+          fontSize: 11,
+          height: 1.5,
+          letterSpacing: 0.3,
+        ),
+      ),
+    );
+  }
+
+  Widget _buildParagraph(String text) {
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 8),
+      child: Text(
+        text,
+        style: TextStyle(
+          color: Colors.white.withValues(alpha: 0.9),
+          fontSize: 16,
+          height: 1.8,
+          letterSpacing: 0.5,
+        ),
+      ),
+    );
+  }
+
+  Widget _buildLoading() {
     return Center(
       child: Column(
         mainAxisSize: MainAxisSize.min,
@@ -129,7 +298,7 @@ class _CharacterDetailPageState extends State<CharacterDetailPage> {
     );
   }
 
-  Widget _buildMessageState(String message) {
+  Widget _buildMessage(String message) {
     return Center(
       child: Column(
         mainAxisSize: MainAxisSize.min,
@@ -154,61 +323,70 @@ class _CharacterDetailPageState extends State<CharacterDetailPage> {
   }
 }
 
-/// 简单的 Markdown 纯文本清洗。
-///
-/// 只处理故事文件中常见的标题、引用、列表、强调、代码围栏和链接等标记，
-/// 保留段落文字与换行，避免引入额外的 Markdown 渲染依赖。
-String _cleanMarkdown(String source) {
-  String text = source.replaceAll('\r\n', '\n').replaceAll('\r', '\n');
+final RegExp _headingPattern = RegExp(r'^\s{0,3}(#{1,6})\s+(.*)$');
+final RegExp _quotePattern = RegExp(r'^\s{0,3}(?:>\s?)+');
+final RegExp _listPattern = RegExp(r'^\s{0,3}(?:[-*+]|\d+\.)\s+');
+final RegExp _rulePattern = RegExp(r'^\s{0,3}(?:[-*_]\s*){3,}$');
+final RegExp _fencePattern = RegExp(r'^\s*```');
+final RegExp _storyPattern = RegExp(r'^角色故事\s*(\d{1,2})$');
 
-  // 代码围栏本身不展示，围栏内的文本保留。
-  text = text.replaceAll(RegExp(r'```[^\n]*'), '');
+String _stripInlineMarkdown(String text) {
+  String value = text;
 
-  // 图片整体移除；普通链接只保留链接文字。
-  text = text.replaceAll(RegExp(r'!\[[^\]]*\]\([^)]*\)'), '');
-  text = text.replaceAllMapped(
+  value = value.replaceAll(RegExp(r'!\[[^\]]*\]\([^)]*\)'), '');
+  value = value.replaceAllMapped(
     RegExp(r'\[([^\]]+)\]\([^)]*\)'),
     (Match match) => match.group(1) ?? '',
   );
-
-  // 常见 HTML 换行与标签。
-  text = text.replaceAll(RegExp(r'<br\s*/?>', caseSensitive: false), '\n');
-  text = text.replaceAll(RegExp(r'<[^>]+>'), '');
-
-  // 标题、引用（支持嵌套）、有序 / 无序列表。
-  text = text.replaceAll(RegExp(r'^\s{0,3}#{1,6}\s*', multiLine: true), '');
-  text = text.replaceAll(RegExp(r'^\s{0,3}(?:>\s?)+', multiLine: true), '');
-  text = text.replaceAll(
-    RegExp(r'^\s{0,3}(?:[-*+]|\d+\.)\s+', multiLine: true),
-    '',
-  );
-
-  // 水平分割线。
-  text = text.replaceAll(
-    RegExp(r'^\s{0,3}(?:[-*_]\s*){3,}$', multiLine: true),
-    '',
-  );
-
-  // 剩余的行内强调、代码与标题符号。
-  text = text.replaceAll(RegExp(r'[*_~`#]'), '');
-
-  // 常见 HTML 实体。
-  text = text
+  value = value.replaceAll(RegExp(r'<br\s*/?>', caseSensitive: false), ' ');
+  value = value.replaceAll(RegExp(r'<[^>]+>'), '');
+  value = value.replaceAll(RegExp(r'[*_~`#]'), '');
+  value = value
       .replaceAll('&nbsp;', ' ')
       .replaceAll('&amp;', '&')
       .replaceAll('&lt;', '<')
       .replaceAll('&gt;', '>');
 
-  // 清理行尾空白，并折叠过多的连续空行。
-  text = text.replaceAll(RegExp(r'[ \t]+$', multiLine: true), '');
-  text = text.replaceAll(RegExp(r'\n{3,}'), '\n\n');
-
-  return text.trim();
+  return value.trim();
 }
 
-/// 液态玻璃圆形返回按钮。
-///
-/// 按下缩放到 0.95，松开后弹回；毛玻璃背景上叠加半透明白色描边。
+int? _storyNumber(String text) {
+  final RegExpMatch? match = _storyPattern.firstMatch(text);
+  if (match == null) {
+    return null;
+  }
+  return int.tryParse(match.group(1)!);
+}
+
+String _localizeStoryTitle(String text) {
+  final int? number = _storyNumber(text);
+  if (number == null) {
+    return text;
+  }
+  return '角色故事${_numberToChinese(number)}';
+}
+
+String _numberToChinese(int number) {
+  const List<String> numerals = <String>[
+    '零',
+    '一',
+    '二',
+    '三',
+    '四',
+    '五',
+    '六',
+    '七',
+    '八',
+    '九',
+    '十',
+  ];
+
+  if (number >= 0 && number < numerals.length) {
+    return numerals[number];
+  }
+  return number.toString();
+}
+
 class _GlassBackButton extends StatefulWidget {
   const _GlassBackButton({super.key, required this.onTap});
 

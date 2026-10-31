@@ -100,13 +100,27 @@ void main() {
       findsOneWidget,
     );
     expect(find.textContaining('角色详细'), findsOneWidget);
+    expect(find.text('角色故事一'), findsOneWidget);
+    expect(find.text('角色故事1'), findsNothing);
+    expect(find.text('解锁条件：好感2级'), findsOneWidget);
+    expect(find.text('-------------------------'), findsWidgets);
+    expect(find.textContaining('这门技术历史悠久'), findsOneWidget);
+    expect(find.textContaining('##'), findsNothing);
+    expect(find.textContaining('> 解锁条件'), findsNothing);
     expect(find.text('ALBEDO'), findsNothing);
     expect(find.text('角色列表'), findsNothing);
 
-    final Text storyText = tester.widget<Text>(find.textContaining('角色详细'));
-    expect(storyText.data, isNotNull);
-    expect(storyText.data, isNot(contains('##')));
-    expect(storyText.data, isNot(contains('> 解锁条件')));
+    final Text storyTitle = tester.widget<Text>(find.text('角色故事一'));
+    expect(storyTitle.style?.fontSize, 20);
+    expect(storyTitle.style?.fontWeight, FontWeight.w700);
+
+    final Text unlockCondition = tester.widget<Text>(find.text('解锁条件：好感2级'));
+    expect(unlockCondition.style?.fontSize, 14);
+    expect(unlockCondition.style?.color, Colors.white70);
+
+    final Text bodyText = tester.widget<Text>(find.textContaining('这门技术历史悠久'));
+    expect(bodyText.style?.fontSize, 16);
+    expect(bodyText.style?.height, 1.8);
 
     // 从详情页的悬浮玻璃按钮返回角色列表。
     await tester.tap(find.byKey(const Key('character-detail-back-button')));
