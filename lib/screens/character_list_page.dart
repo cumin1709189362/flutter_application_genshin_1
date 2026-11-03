@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 
 import '../models/character.dart';
 import '../widgets/aurora_background.dart';
+import '../widgets/liquid_glass_button.dart';
 import 'character_detail_page.dart';
 
 /// 蒙德角色数据，严格按英文名 A-Z 升序排列。
@@ -1062,162 +1063,102 @@ class CharacterListPage extends StatelessWidget {
 
 /// 长矩形液态玻璃角色按钮。
 ///
-/// 结构：BackdropFilter 模糊 + 元素淡彩底色 + 1px 半透明白色边框；
-/// 按下缩放到 0.95，松开后以 elasticOut 曲线弹回。
-class _CharacterGlassTile extends StatefulWidget {
+/// 玻璃材质和按压反馈统一交给 [LiquidGlassButton] 处理。
+class _CharacterGlassTile extends StatelessWidget {
   const _CharacterGlassTile({required this.character, required this.onTap});
 
   final Character character;
   final VoidCallback onTap;
 
   @override
-  State<_CharacterGlassTile> createState() => _CharacterGlassTileState();
-}
-
-class _CharacterGlassTileState extends State<_CharacterGlassTile> {
-  static const BorderRadius _borderRadius = BorderRadius.all(
-    Radius.circular(22),
-  );
-
-  bool _pressed = false;
-
-  void _setPressed(bool value) {
-    if (_pressed == value) {
-      return;
-    }
-    setState(() => _pressed = value);
-  }
-
-  @override
   Widget build(BuildContext context) {
-    final Character character = widget.character;
-
-    // 元素标准色 20% 透明度，得到淡彩玻璃质感。
-    final Color fillColor = character.elementColor.withValues(alpha: 0.2);
-
-    return Semantics(
-      button: true,
-      label: '${character.zhName} ${character.enName}',
-      child: GestureDetector(
-        behavior: HitTestBehavior.opaque,
-        onTapDown: (_) => _setPressed(true),
-        onTapUp: (_) => _setPressed(false),
-        onTapCancel: () => _setPressed(false),
-        onTap: widget.onTap,
-        child: AnimatedScale(
-          scale: _pressed ? 0.95 : 1.0,
-          duration: Duration(milliseconds: _pressed ? 110 : 420),
-          // 按下快速收缩，松开时 Q 弹回位。
-          curve: _pressed ? Curves.easeOutCubic : Curves.elasticOut,
-          child: DecoratedBox(
-            decoration: BoxDecoration(
-              borderRadius: _borderRadius,
-              boxShadow: <BoxShadow>[
-                // 黑色投影把玻璃从极光背景里轻轻托起。
-                BoxShadow(
-                  color: Colors.black.withValues(alpha: 0.28),
-                  blurRadius: 18,
-                  offset: const Offset(0, 8),
-                ),
-                // 元素色微光，让每行保留一点角色元素氛围。
-                BoxShadow(
-                  color: character.elementColor.withValues(
-                    alpha: _pressed ? 0.18 : 0.10,
-                  ),
-                  blurRadius: 24,
-                  spreadRadius: 1,
-                ),
-              ],
-            ),
-            child: ClipRRect(
-              borderRadius: _borderRadius,
-              child: BackdropFilter(
-                filter: ImageFilter.blur(sigmaX: 16, sigmaY: 16),
-                child: AnimatedContainer(
-                  duration: const Duration(milliseconds: 180),
-                  constraints: const BoxConstraints(minHeight: 64),
-                  padding: const EdgeInsets.all(20),
-                  decoration: BoxDecoration(
-                    color: fillColor,
-                    borderRadius: _borderRadius,
-                    border: Border.all(
-                      color: Colors.white.withValues(
-                        alpha: _pressed ? 0.46 : 0.28,
-                      ),
-                      width: 1,
-                    ),
-                  ),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: <Widget>[
-                      Expanded(
-                        child: FittedBox(
-                          fit: BoxFit.scaleDown,
-                          alignment: Alignment.centerLeft,
-                          child: Text(
-                            _toTitleCase(character.enName),
-                            maxLines: 1,
-                            softWrap: false,
-                            style: const TextStyle(
-                              color: Colors.white,
-                              fontSize: 18,
-                              fontWeight: FontWeight.w500,
-                              height: 1.2,
-                              letterSpacing: 1.2,
-                            ),
-                          ),
-                        ),
-                      ),
-                      const SizedBox(width: 16),
-                      Row(
-                        mainAxisSize: MainAxisSize.min,
-                        children: <Widget>[
-                          Text(
-                            character.zhName,
-                            maxLines: 1,
-                            overflow: TextOverflow.ellipsis,
-                            style: const TextStyle(
-                              color: Colors.white,
-                              fontSize: 17,
-                              fontWeight: FontWeight.w500,
-                              height: 1.2,
-                              letterSpacing: 2.0,
-                            ),
-                          ),
-                          const SizedBox(width: 12),
-                          // 用 Container 的 boxShadow 给透明 PNG 图标叠加一圈
-                          // 极淡的白色柔光，避免光晕盖过图标本身的细节。
-                          Container(
-                            decoration: BoxDecoration(
-                              shape: BoxShape.circle,
-                              boxShadow: <BoxShadow>[
-                                BoxShadow(
-                                  color: Colors.white.withValues(alpha: 0.2),
-                                  blurRadius: 4,
-                                  spreadRadius: 0.5,
-                                ),
-                              ],
-                            ),
-                            child: Image.asset(
-                              character.elementIconPath,
-                              width: 24,
-                              height: 24,
-                              fit: BoxFit.contain,
-                              // 原始图标约 3000px 宽，按 24dp 显示时只需解码到 96px，
-                              // 避免几张超大 PNG 占满 ImageCache。
-                              cacheWidth: 96,
-                              excludeFromSemantics: true,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ],
-                  ),
+    return LiquidGlassButton(
+      onTap: onTap,
+      semanticLabel: '${character.zhName} ${character.enName}',
+      borderRadius: 22,
+      padding: const EdgeInsets.all(20),
+      constraints: const BoxConstraints(minHeight: 64),
+      backgroundColor: character.elementColor.withValues(alpha: 0.2),
+      borderColor: Colors.white.withValues(alpha: 0.28),
+      boxShadow: <BoxShadow>[
+        // 黑色投影把玻璃从极光背景里轻轻托起。
+        BoxShadow(
+          color: Colors.black.withValues(alpha: 0.28),
+          blurRadius: 18,
+          offset: const Offset(0, 8),
+        ),
+        // 元素色微光，让每行保留一点角色元素氛围。
+        BoxShadow(
+          color: character.elementColor.withValues(alpha: 0.10),
+          blurRadius: 24,
+          spreadRadius: 1,
+        ),
+      ],
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: <Widget>[
+          Expanded(
+            child: FittedBox(
+              fit: BoxFit.scaleDown,
+              alignment: Alignment.centerLeft,
+              child: Text(
+                _toTitleCase(character.enName),
+                maxLines: 1,
+                softWrap: false,
+                style: const TextStyle(
+                  color: Colors.white,
+                  fontSize: 18,
+                  fontWeight: FontWeight.w500,
+                  height: 1.2,
+                  letterSpacing: 1.2,
                 ),
               ),
             ),
           ),
-        ),
+          const SizedBox(width: 16),
+          Row(
+            mainAxisSize: MainAxisSize.min,
+            children: <Widget>[
+              Text(
+                character.zhName,
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+                style: const TextStyle(
+                  color: Colors.white,
+                  fontSize: 17,
+                  fontWeight: FontWeight.w500,
+                  height: 1.2,
+                  letterSpacing: 2.0,
+                ),
+              ),
+              const SizedBox(width: 12),
+              // 用 Container 的 boxShadow 给透明 PNG 图标叠加一圈
+              // 极淡的白色柔光，避免光晕盖过图标本身的细节。
+              Container(
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  boxShadow: <BoxShadow>[
+                    BoxShadow(
+                      color: Colors.white.withValues(alpha: 0.2),
+                      blurRadius: 4,
+                      spreadRadius: 0.5,
+                    ),
+                  ],
+                ),
+                child: Image.asset(
+                  character.elementIconPath,
+                  width: 24,
+                  height: 24,
+                  fit: BoxFit.contain,
+                  // 原始图标约 3000px 宽，按 24dp 显示时只需解码到 96px，
+                  // 避免几张超大 PNG 占满 ImageCache。
+                  cacheWidth: 96,
+                  excludeFromSemantics: true,
+                ),
+              ),
+            ],
+          ),
+        ],
       ),
     );
   }

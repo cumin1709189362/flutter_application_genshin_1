@@ -93,6 +93,8 @@ void main() {
     // 点击角色进入详情页，故事异步加载完成后应展示纯文本内容。
     await tester.tap(find.text('Albedo'));
     await tester.pump();
+    // LiquidGlassButton 会先保留至少 110ms 的按压反馈，再触发跳转。
+    await tester.pump(const Duration(milliseconds: 150));
     await tester.pump(const Duration(milliseconds: 900));
 
     expect(
@@ -125,6 +127,8 @@ void main() {
     // 从详情页的悬浮玻璃按钮返回角色列表。
     await tester.tap(find.byKey(const Key('character-detail-back-button')));
     await tester.pump();
+    // 同样等待 LiquidGlassButton 的最短按压时间，再让 pop 转场完成。
+    await tester.pump(const Duration(milliseconds: 150));
     await tester.pump(const Duration(milliseconds: 900));
 
     expect(find.text('Albedo'), findsOneWidget);

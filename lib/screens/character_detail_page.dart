@@ -1,10 +1,9 @@
-import 'dart:ui';
-
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
 import '../models/character.dart';
 import '../widgets/aurora_background.dart';
+import '../widgets/liquid_glass_button.dart';
 
 /// 角色详情页：以沉浸式长文阅读的方式展示角色背景故事。
 class CharacterDetailPage extends StatefulWidget {
@@ -22,14 +21,26 @@ class _CharacterDetailPageState extends State<CharacterDetailPage> {
   static const double _bottomContentGap = 48;
   static const String _dividerText = '-------------------------';
 
+  /// 让列表页的 620ms 转场先完成，再回到 UI Thread 解析长文本。
+  static const Duration _deferParsingDuration = Duration(milliseconds: 650);
+
   late final Future<String> _storyFuture;
 
   @override
   void initState() {
     super.initState();
-    _storyFuture = rootBundle.loadString(
+    _storyFuture = _loadStory();
+  }
+
+  Future<String> _loadStory() async {
+    final String raw = await rootBundle.loadString(
       'assets/stories/${widget.character.zhName}.md',
     );
+
+    // 文件读取本身是异步 I/O；这里再等转场结束，
+    // 避免在 PageRouteBuilder 动画期间做正则清洗和 Widget 列表构建。
+    await Future<void>.delayed(_deferParsingDuration);
+    return raw;
   }
 
   @override
@@ -387,65 +398,30 @@ String _numberToChinese(int number) {
   return number.toString();
 }
 
-class _GlassBackButton extends StatefulWidget {
+class _GlassBackButton extends StatelessWidget {
   const _GlassBackButton({super.key, required this.onTap});
 
   final VoidCallback onTap;
 
   @override
-  State<_GlassBackButton> createState() => _GlassBackButtonState();
-}
-
-class _GlassBackButtonState extends State<_GlassBackButton> {
-  static const double _size = 48.0;
-
-  bool _pressed = false;
-
-  void _setPressed(bool value) {
-    if (_pressed == value) {
-      return;
-    }
-    setState(() => _pressed = value);
-  }
-
-  @override
   Widget build(BuildContext context) {
-    return Semantics(
-      button: true,
-      label: '返回',
-      child: GestureDetector(
-        behavior: HitTestBehavior.opaque,
-        onTapDown: (_) => _setPressed(true),
-        onTapUp: (_) => _setPressed(false),
-        onTapCancel: () => _setPressed(false),
-        onTap: widget.onTap,
-        child: AnimatedScale(
-          scale: _pressed ? 0.95 : 1.0,
-          duration: Duration(milliseconds: _pressed ? 110 : 380),
-          curve: _pressed ? Curves.easeOutCubic : Curves.elasticOut,
-          child: ClipOval(
-            child: BackdropFilter(
-              filter: ImageFilter.blur(sigmaX: 12, sigmaY: 12),
-              child: Container(
-                width: _size,
-                height: _size,
-                decoration: BoxDecoration(
-                  shape: BoxShape.circle,
-                  color: Colors.black.withValues(alpha: 0.28),
-                  border: Border.all(
-                    color: Colors.white.withValues(alpha: 0.3),
-                    width: 1,
-                  ),
-                ),
-                child: const Center(
-                  child: Icon(
-                    Icons.arrow_back_ios_new_rounded,
-                    color: Colors.white,
-                    size: 19,
-                  ),
-                ),
-              ),
-            ),
+    return SizedBox(
+      width: 48,
+      height: 48,
+      child: LiquidGlassButton(
+        onTap: onTap,
+        semanticLabel: '返回',
+        borderRadius: 24,
+        padding: EdgeInsets.zero,
+        backgroundColor: Colors.black.withValues(alpha: 0.28),
+        borderColor: Colors.white.withValues(alpha: 0.3),
+        boxShadow: const <BoxShadow>[],
+        blurSigma: 12,
+        child: const Center(
+          child: Icon(
+            Icons.arrow_back_ios_new_rounded,
+            color: Colors.white,
+            size: 19,
           ),
         ),
       ),
