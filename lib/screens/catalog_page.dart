@@ -193,7 +193,7 @@ class CatalogPage extends StatelessWidget {
                           style: TextStyle(
                             color: Colors.white,
                             fontSize: 23,
-                            fontWeight: FontWeight.w600,
+                            fontWeight: FontWeight.w400,
                             height: 1.0,
                             letterSpacing: 2.5,
                             shadows: <Shadow>[

@@ -189,7 +189,7 @@ class _CharacterDetailPageState extends State<CharacterDetailPage> {
         style: TextStyle(
           color: Colors.white,
           fontSize: 30,
-          fontWeight: FontWeight.w600,
+          fontWeight: FontWeight.w400,
           height: 1.3,
           letterSpacing: 4,
           shadows: <Shadow>[
