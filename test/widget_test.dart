@@ -14,6 +14,14 @@ void _usePhoneViewport(WidgetTester tester) {
   addTearDown(tester.view.reset);
 }
 
+/// SolidGradientButton 会先展示约 110ms 的按压反馈，再开始页面转场。
+Future<void> _tapSolidButton(WidgetTester tester, Finder finder) async {
+  await tester.tap(finder);
+  await tester.pump();
+  await tester.pump(const Duration(milliseconds: 150));
+  await tester.pump(const Duration(milliseconds: 900));
+}
+
 void main() {
   testWidgets('首页展示标题与箭头按钮', (WidgetTester tester) async {
     _usePhoneViewport(tester);
@@ -29,11 +37,7 @@ void main() {
     await tester.pumpWidget(const GenshinApp());
     await tester.pump(const Duration(milliseconds: 300));
 
-    await tester.tap(find.text('→'));
-    await tester.pump();
-    // 极光背景是无限循环动画，不能使用 pumpAndSettle，
-    // 这里显式推进到转场结束。
-    await tester.pump(const Duration(milliseconds: 900));
+    await _tapSolidButton(tester, find.text('→'));
 
     // 目录页顶部也有同名标题。
     expect(find.text('Genshin Impact Characters'), findsOneWidget);
@@ -49,13 +53,9 @@ void main() {
     await tester.pumpWidget(const GenshinApp());
     await tester.pump(const Duration(milliseconds: 300));
 
-    await tester.tap(find.text('→'));
-    await tester.pump();
-    await tester.pump(const Duration(milliseconds: 900));
+    await _tapSolidButton(tester, find.text('→'));
 
-    await tester.tap(find.text('蒙德'));
-    await tester.pump();
-    await tester.pump(const Duration(milliseconds: 900));
+    await _tapSolidButton(tester, find.text('蒙德'));
 
     expect(find.text('角色列表'), findsOneWidget);
     expect(find.text('24 位'), findsOneWidget);
@@ -146,13 +146,9 @@ void main() {
     await tester.pumpWidget(const GenshinApp());
     await tester.pump(const Duration(milliseconds: 300));
 
-    await tester.tap(find.text('→'));
-    await tester.pump();
-    await tester.pump(const Duration(milliseconds: 900));
+    await _tapSolidButton(tester, find.text('→'));
 
-    await tester.tap(find.text('璃月'));
-    await tester.pump();
-    await tester.pump(const Duration(milliseconds: 900));
+    await _tapSolidButton(tester, find.text('璃月'));
 
     // 标题与数量都来自当前国家数据，而不是写死的蒙德。
     expect(find.text('璃月'), findsOneWidget);
@@ -189,9 +185,7 @@ void main() {
     await tester.pumpWidget(const GenshinApp());
     await tester.pump(const Duration(milliseconds: 300));
 
-    await tester.tap(find.text('→'));
-    await tester.pump();
-    await tester.pump(const Duration(milliseconds: 900));
+    await _tapSolidButton(tester, find.text('→'));
 
     const Map<String, String> expectedCounts = <String, String>{
       '蒙德': '24 位',
@@ -205,9 +199,7 @@ void main() {
     };
 
     for (final MapEntry<String, String> entry in expectedCounts.entries) {
-      await tester.tap(find.text(entry.key));
-      await tester.pump();
-      await tester.pump(const Duration(milliseconds: 900));
+      await _tapSolidButton(tester, find.text(entry.key));
 
       expect(find.text(entry.key), findsOneWidget);
       expect(find.text(entry.value), findsOneWidget);
@@ -223,13 +215,9 @@ void main() {
     await tester.pumpWidget(const GenshinApp());
     await tester.pump(const Duration(milliseconds: 300));
 
-    await tester.tap(find.text('→'));
-    await tester.pump();
-    await tester.pump(const Duration(milliseconds: 900));
+    await _tapSolidButton(tester, find.text('→'));
 
-    await tester.tap(find.text('稻妻'));
-    await tester.pump();
-    await tester.pump(const Duration(milliseconds: 900));
+    await _tapSolidButton(tester, find.text('稻妻'));
 
     final Finder longName = find.text('Kaedehara Kazuha');
     expect(longName, findsOneWidget);

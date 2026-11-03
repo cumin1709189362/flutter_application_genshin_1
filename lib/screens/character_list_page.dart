@@ -1,10 +1,8 @@
-import 'dart:ui';
-
 import 'package:flutter/material.dart';
 
 import '../models/character.dart';
 import '../widgets/aurora_background.dart';
-import '../widgets/liquid_glass_button.dart';
+import '../widgets/solid_gradient_button.dart';
 import 'character_detail_page.dart';
 
 /// 蒙德角色数据，严格按英文名 A-Z 升序排列。
@@ -908,7 +906,7 @@ class CharacterListPage extends StatelessWidget {
                         16 + bottomInset,
                       ),
                       // 保持列表项状态并为每一项建立独立重绘边界，
-                      // 配合表头的 BackdropFilter，滚动时减少不必要的重建和重绘。
+                      // 配合高性能按钮减少滚动时的重建和重绘。
                       addAutomaticKeepAlives: true,
                       addRepaintBoundaries: true,
                       itemCount: characters.length,
@@ -917,7 +915,7 @@ class CharacterListPage extends StatelessWidget {
                         return Padding(
                           // 水平 16 已由列表 padding 提供，这里补足垂直 8。
                           padding: const EdgeInsets.symmetric(vertical: 8),
-                          child: _CharacterGlassTile(
+                          child: _CharacterButton(
                             character: character,
                             onTap: () =>
                                 _openCharacterDetail(context, character),
@@ -938,86 +936,88 @@ class CharacterListPage extends StatelessWidget {
     );
   }
 
-  /// 悬浮液态玻璃表头：返回按钮 + 国家标题 + 角色数量。
+  /// 悬浮半透明表头：返回按钮 + 国家标题 + 角色数量。
   ///
   /// 背景延伸到状态栏下方，内容由 [SafeArea] 保护，避免和系统状态栏重叠。
   Widget _buildHeader(int characterCount) {
     return Listener(
       // 表头是悬浮层，吸收空白区域的点击，避免误触到被遮住的列表项。
       behavior: HitTestBehavior.opaque,
-      child: ClipRect(
-        child: BackdropFilter(
-          filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
-          child: Container(
-            decoration: BoxDecoration(
-              color: Colors.black.withValues(alpha: 0.35),
-              border: Border(
-                bottom: BorderSide(
-                  color: Colors.white.withValues(alpha: 0.12),
-                  width: 1,
-                ),
-              ),
+      child: Container(
+        decoration: BoxDecoration(
+          color: Colors.black.withValues(alpha: 0.6),
+          border: Border(
+            bottom: BorderSide(
+              color: Colors.white.withValues(alpha: 0.12),
+              width: 1,
             ),
-            child: SafeArea(
-              bottom: false,
-              child: SizedBox(
-                height: _headerHeight,
-                child: Padding(
-                  padding: const EdgeInsets.fromLTRB(4, 0, 20, 0),
-                  child: Row(
-                    children: <Widget>[
-                      const BackButton(color: Colors.white),
-                      const SizedBox(width: 4),
-                      Expanded(
-                        child: Column(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: <Widget>[
-                            Text(
-                              countryName,
-                              maxLines: 1,
-                              overflow: TextOverflow.ellipsis,
-                              style: TextStyle(
-                                color: Colors.white,
-                                fontSize: 25,
-                                fontWeight: FontWeight.w500,
-                                height: 1.1,
-                                letterSpacing: 4,
-                                shadows: <Shadow>[
-                                  Shadow(
-                                    color: Colors.white.withValues(alpha: 0.45),
-                                    blurRadius: 18,
-                                  ),
-                                ],
-                              ),
-                            ),
-                            const SizedBox(height: 4),
-                            Text(
-                              '角色列表',
-                              style: TextStyle(
-                                color: Colors.white.withValues(alpha: 0.52),
-                                fontSize: 10,
-                                fontWeight: FontWeight.w400,
-                                height: 1.0,
-                                letterSpacing: 4,
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                      if (characterCount > 0)
+          ),
+          boxShadow: <BoxShadow>[
+            BoxShadow(
+              color: Colors.black.withValues(alpha: 0.18),
+              blurRadius: 12,
+              offset: const Offset(0, 4),
+            ),
+          ],
+        ),
+        child: SafeArea(
+          bottom: false,
+          child: SizedBox(
+            height: _headerHeight,
+            child: Padding(
+              padding: const EdgeInsets.fromLTRB(4, 0, 20, 0),
+              child: Row(
+                children: <Widget>[
+                  const BackButton(color: Colors.white),
+                  const SizedBox(width: 4),
+                  Expanded(
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: <Widget>[
                         Text(
-                          '$characterCount 位',
+                          countryName,
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
                           style: TextStyle(
-                            color: Colors.white.withValues(alpha: 0.45),
-                            fontSize: 11,
-                            fontWeight: FontWeight.w400,
-                            letterSpacing: 1.5,
+                            color: Colors.white,
+                            fontSize: 25,
+                            fontWeight: FontWeight.w500,
+                            height: 1.1,
+                            letterSpacing: 4,
+                            shadows: <Shadow>[
+                              Shadow(
+                                color: Colors.white.withValues(alpha: 0.45),
+                                blurRadius: 18,
+                              ),
+                            ],
                           ),
                         ),
-                    ],
+                        const SizedBox(height: 4),
+                        Text(
+                          '角色列表',
+                          style: TextStyle(
+                            color: Colors.white.withValues(alpha: 0.52),
+                            fontSize: 10,
+                            fontWeight: FontWeight.w400,
+                            height: 1.0,
+                            letterSpacing: 4,
+                          ),
+                        ),
+                      ],
+                    ),
                   ),
-                ),
+                  if (characterCount > 0)
+                    Text(
+                      '$characterCount 位',
+                      style: TextStyle(
+                        color: Colors.white.withValues(alpha: 0.45),
+                        fontSize: 11,
+                        fontWeight: FontWeight.w400,
+                        letterSpacing: 1.5,
+                      ),
+                    ),
+                ],
               ),
             ),
           ),
@@ -1061,39 +1061,25 @@ class CharacterListPage extends StatelessWidget {
   }
 }
 
-/// 长矩形液态玻璃角色按钮。
+/// 长矩形角色按钮。
 ///
-/// 玻璃材质和按压反馈统一交给 [LiquidGlassButton] 处理。
-class _CharacterGlassTile extends StatelessWidget {
-  const _CharacterGlassTile({required this.character, required this.onTap});
+/// 实色半透明材质和按压反馈统一交给 [SolidGradientButton] 处理。
+class _CharacterButton extends StatelessWidget {
+  const _CharacterButton({required this.character, required this.onTap});
 
   final Character character;
   final VoidCallback onTap;
 
   @override
   Widget build(BuildContext context) {
-    return LiquidGlassButton(
+    return SolidGradientButton(
       onTap: onTap,
       semanticLabel: '${character.zhName} ${character.enName}',
       borderRadius: 22,
       padding: const EdgeInsets.all(20),
       constraints: const BoxConstraints(minHeight: 64),
-      backgroundColor: character.elementColor.withValues(alpha: 0.2),
-      borderColor: Colors.white.withValues(alpha: 0.28),
-      boxShadow: <BoxShadow>[
-        // 黑色投影把玻璃从极光背景里轻轻托起。
-        BoxShadow(
-          color: Colors.black.withValues(alpha: 0.28),
-          blurRadius: 18,
-          offset: const Offset(0, 8),
-        ),
-        // 元素色微光，让每行保留一点角色元素氛围。
-        BoxShadow(
-          color: character.elementColor.withValues(alpha: 0.10),
-          blurRadius: 24,
-          spreadRadius: 1,
-        ),
-      ],
+      backgroundColor: character.elementColor,
+      borderColor: character.elementColor.withValues(alpha: 0.6),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: <Widget>[

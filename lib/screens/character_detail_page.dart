@@ -3,7 +3,7 @@ import 'package:flutter/services.dart';
 
 import '../models/character.dart';
 import '../widgets/aurora_background.dart';
-import '../widgets/liquid_glass_button.dart';
+import '../widgets/solid_gradient_button.dart';
 
 /// 角色详情页：以沉浸式长文阅读的方式展示角色背景故事。
 class CharacterDetailPage extends StatefulWidget {
@@ -408,15 +408,13 @@ class _GlassBackButton extends StatelessWidget {
     return SizedBox(
       width: 48,
       height: 48,
-      child: LiquidGlassButton(
+      child: SolidGradientButton(
         onTap: onTap,
         semanticLabel: '返回',
         borderRadius: 24,
         padding: EdgeInsets.zero,
-        backgroundColor: Colors.black.withValues(alpha: 0.28),
-        borderColor: Colors.white.withValues(alpha: 0.3),
-        boxShadow: const <BoxShadow>[],
-        blurSigma: 12,
+        backgroundColor: Colors.black,
+        borderColor: Colors.white.withValues(alpha: 0.6),
         child: const Center(
           child: Icon(
             Icons.arrow_back_ios_new_rounded,

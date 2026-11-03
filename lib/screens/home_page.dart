@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 
 import '../widgets/aurora_background.dart';
-import '../widgets/glass_button.dart';
+import '../widgets/solid_gradient_button.dart';
 import 'catalog_page.dart';
 
-/// 首页：极光背景 + 发光标题 + 液态玻璃箭头按钮。
+/// 首页：极光背景 + 发光标题 + 高性能半透明箭头按钮。
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
 
@@ -142,12 +142,16 @@ class _HomePageState extends State<HomePage>
                     ),
                   ),
                   const SizedBox(height: 42),
-                  GlassButton(
+                  SolidGradientButton(
                     onTap: _openCatalog,
+                    semanticLabel: '进入国家目录',
                     width: 92,
                     height: 52,
                     borderRadius: 26,
                     padding: EdgeInsets.zero,
+                    backgroundColor: Colors.white,
+                    backgroundOpacity: 0.10,
+                    borderColor: Colors.white.withValues(alpha: 0.5),
                     child: const Center(
                       child: Text(
                         '→',

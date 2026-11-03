@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../widgets/aurora_background.dart';
-import '../widgets/glass_button.dart';
+import '../widgets/solid_gradient_button.dart';
 import 'character_list_page.dart';
 
 /// 国家 / 地区条目。
@@ -145,11 +145,13 @@ class CatalogPage extends StatelessWidget {
                 itemCount: _nations.length,
                 itemBuilder: (context, index) {
                   final _Nation nation = _nations[index];
-                  return GlassButton(
-                    tint: nation.color,
+                  return SolidGradientButton(
+                    onTap: () => _openCharacterList(context, nation),
+                    semanticLabel: '${nation.nameZh} ${nation.nameEn}',
+                    backgroundColor: nation.color,
+                    borderColor: nation.color.withValues(alpha: 0.6),
                     borderRadius: 22,
                     padding: const EdgeInsets.fromLTRB(16, 14, 16, 15),
-                    onTap: () => _openCharacterList(context, nation),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: <Widget>[
