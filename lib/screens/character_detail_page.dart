@@ -24,23 +24,77 @@ class _CharacterDetailPageState extends State<CharacterDetailPage> {
   /// 让列表页的 620ms 转场先完成，再回到 UI Thread 解析长文本。
   static const Duration _deferParsingDuration = Duration(milliseconds: 650);
 
+  /// 故事 Markdown 所在目录，必须与 pubspec.yaml 中声明的 assets 目录一致。
+  static const String _storyAssetDir = 'assets/stories/';
+
+  /// 本次实际读取的资源路径，例如 `assets/stories/米提亚.md`。
+  ///
+  /// 中文名两端若混入空格、制表符或换行，`rootBundle` 会直接抛
+  /// Asset not found，所以这里统一 `trim()` 后再拼路径。
+  late final String _storyAssetPath;
+
   late final Future<String> _storyFuture;
 
   @override
   void initState() {
     super.initState();
-    _storyFuture = _loadStory();
+    _storyAssetPath = '$_storyAssetDir${widget.character.zhName.trim()}.md';
+    _storyFuture = _loadStory(_storyAssetPath);
   }
 
-  Future<String> _loadStory() async {
-    final String raw = await rootBundle.loadString(
-      'assets/stories/${widget.character.zhName}.md',
-    );
+  Future<String> _loadStory(String assetPath) async {
+    try {
+      final String raw = await rootBundle.loadString(assetPath);
 
-    // 文件读取本身是异步 I/O；这里再等转场结束，
-    // 避免在 PageRouteBuilder 动画期间做正则清洗和 Widget 列表构建。
-    await Future<void>.delayed(_deferParsingDuration);
-    return raw;
+      // 文件读取本身是异步 I/O；这里再等转场结束，
+      // 避免在 PageRouteBuilder 动画期间做正则清洗和 Widget 列表构建。
+      await Future<void>.delayed(_deferParsingDuration);
+      return raw;
+    } catch (e, stackTrace) {
+      debugPrint('加载失败: $e');
+      debugPrint('尝试读取的资源路径: $assetPath');
+      debugPrintStack(stackTrace: stackTrace);
+
+      // 进一步区分“文件不存在”和“文件存在但没被打进包”。
+      await _logStoryManifest(assetPath);
+      rethrow;
+    }
+  }
+
+  /// Debug 用：把资源清单里 `assets/stories/` 下的条目打出来。
+  ///
+  /// 如果这里显示 `contains = false`，说明资源没进构建产物
+  /// （新增文件后没有重新打包），而不是 Dart 路径写错。
+  Future<void> _logStoryManifest(String assetPath) async {
+    try {
+      final AssetManifest manifest =
+          await AssetManifest.loadFromAssetBundle(rootBundle);
+      final List<String> stories = manifest
+          .listAssets()
+          .where((String key) => key.startsWith(_storyAssetDir))
+          .toList()
+        ..sort();
+
+      final bool contained = stories.contains(assetPath);
+      debugPrint(
+        'AssetManifest: assets/stories/ 共 ${stories.length} 个条目，'
+        '包含 $assetPath = $contained',
+      );
+
+      if (!contained) {
+        final String name = widget.character.zhName.trim();
+        final List<String> similar = stories
+            .where((String key) => key.contains(name))
+            .toList();
+        debugPrint(
+          similar.isEmpty
+              ? '清单中没有任何名称含「$name」的资源，多为新增资源未重新打包。'
+              : '清单中存在相似资源: $similar',
+        );
+      }
+    } catch (e) {
+      debugPrint('读取 AssetManifest 失败: $e');
+    }
   }
 
   @override
