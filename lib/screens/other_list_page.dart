@@ -44,6 +44,8 @@ class OtherListPage extends StatelessWidget {
             elementIconPath: '',
           ),
           displayName: '空',
+          // 中文名右侧的「始基力」图标；尺寸由 _ElementIcon 内部固定。
+          iconPath: 'assets/elements/stellar_linchpin.png',
         ),
         _OtherEntry(
           character: Character(
@@ -53,6 +55,7 @@ class OtherListPage extends StatelessWidget {
             elementIconPath: '',
           ),
           displayName: '荧',
+          iconPath: 'assets/elements/stellar_linchpin.png',
         ),
       ],
     ),
@@ -507,6 +510,7 @@ class _OtherEntry {
     required this.character,
     required this.displayName,
     this.title,
+    this.iconPath,
   });
 
   /// 传给详情页的角色对象，`zhName` 用于拼接故事资源路径。
@@ -519,6 +523,12 @@ class _OtherEntry {
   ///
   /// 为 `null` 时按钮只渲染一行中文名（没有副标题），尺寸保持不变。
   final String? title;
+
+  /// 单行排版时紧跟在中文名右侧的图标，例如旅行者的「始基力」。
+  ///
+  /// 为 `null` 表示不显示图标；图标始终以 24 的固定方块参与布局，
+  /// 不会把按钮撑高。
+  final String? iconPath;
 
   /// 是否只显示一行中文名。
   bool get isSingleLine => title == null;
@@ -607,8 +617,8 @@ class _OtherEntryButton extends StatelessWidget {
       semanticLabel: singleLine
           ? '${entry.displayName} ${entry.character.enName}'
           : '${entry.displayName} ${entry.character.enName} ${entry.title}',
-      // 以下三项与 CharacterListPage 的 _CharacterButton 完全一致，
-      // 单行排版（坎瑞亚五大罪人）也复用同一尺寸，不做压缩。
+      // 以下三项与 CharacterListPage 的 _CharacterButton 完全一致；
+      // 所有条目（含旅行者）都用同一套尺寸，不会被内部图标撑大。
       borderRadius: 22,
       padding: const EdgeInsets.all(20),
       constraints: const BoxConstraints(minHeight: 64),
@@ -662,12 +672,12 @@ class _OtherEntryButton extends StatelessWidget {
     );
   }
 
-  /// 坎瑞亚五大罪人：右侧只有一行大字中文名。
+  /// 单行排版：右侧是一行中文名（可选附带图标），坎瑞亚五大罪人与旅行者共用。
   ///
-  /// 外框尺寸与普通角色按钮完全相同（圆角 22 / padding 20 / 最小高度 64），
-  /// 只是内侧少了一行称号，文字由 Row 在垂直方向居中。
+  /// 外框圆角 22、内边距 20、最小高度 64 与普通角色按钮完全一致，
+  /// 图标只占 24 的固定方块，不会把按钮撑高。
   /// 英文名放在 [Expanded] + [FittedBox] 里，名字再长也只会等比缩小，
-  /// 不会挤压或撑破右侧的中文名。
+  /// 不会挤压或撑破右侧的内容。
   Widget _buildSingleLineRow() {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -685,8 +695,80 @@ class _OtherEntryButton extends StatelessWidget {
           ),
         ),
         const SizedBox(width: 16),
-        Text(entry.displayName, maxLines: 1, softWrap: false, style: _zhStyle),
+        // 中文名 + 图标整体贴右，Row 默认 crossAxisAlignment.center 保证垂直居中。
+        _buildSingleLineTrailing(),
       ],
+    );
+  }
+
+  /// 单行排版的右侧内容：中文名，以及可选的单个图标。
+  ///
+  /// 空 / 荧会渲染成 `中文名 → 始基力图标`，两者在同一水平线上垂直居中。
+  Widget _buildSingleLineTrailing() {
+    final String? iconPath = entry.iconPath;
+    if (iconPath == null) {
+      return Text(
+        entry.displayName,
+        maxLines: 1,
+        softWrap: false,
+        style: _zhStyle,
+      );
+    }
+
+    return Row(
+      mainAxisSize: MainAxisSize.min,
+      children: <Widget>[
+        Text(entry.displayName, maxLines: 1, softWrap: false, style: _zhStyle),
+        // 中文名与图标之间留 16，图标与按钮右边缘之间由 padding 的 20 兜底。
+        const SizedBox(width: 16),
+        _ElementIcon(assetPath: iconPath),
+      ],
+    );
+  }
+}
+
+/// 元素 / 阵营图标。
+///
+/// 外圈柔光（白色 20%、blur 4、spread 0.5）与 CharacterListPage 的角色按钮
+/// 完全一致。图标始终放在 24×24 的固定方块里，并用 [ClipRect] 裁掉多余部分，
+/// 因此无论图片本身多大，都不会影响按钮的高度与宽度。
+class _ElementIcon extends StatelessWidget {
+  const _ElementIcon({required this.assetPath, this.size = 24});
+
+  final String assetPath;
+
+  /// 图标的固定占位边长，默认 24（与普通元素图标一致）。
+  final double size;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      decoration: BoxDecoration(
+        shape: BoxShape.circle,
+        boxShadow: <BoxShadow>[
+          BoxShadow(
+            color: Colors.white.withValues(alpha: 0.2),
+            blurRadius: 4,
+            spreadRadius: 0.5,
+          ),
+        ],
+      ),
+      // 固定宽高 + 裁剪：图标再大也只在这个方块内绘制，绝不撑大按钮。
+      child: SizedBox.square(
+        dimension: size,
+        child: ClipRect(
+          child: Image.asset(
+            assetPath,
+            // TODO: 在此处调整 stellar_linchpin 图标大小，不要撑破按钮高度
+            width: size,
+            height: size,
+            fit: BoxFit.contain,
+            // 按 4 倍像素密度解码，避免大图缩小时发糊，也不会浪费内存。
+            cacheWidth: (size * 4).round(),
+            excludeFromSemantics: true,
+          ),
+        ),
+      ),
     );
   }
 }
