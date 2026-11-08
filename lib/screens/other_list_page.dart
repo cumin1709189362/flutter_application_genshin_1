@@ -57,7 +57,7 @@ class OtherListPage extends StatelessWidget {
       character: Character(
         enName: 'Columbina',
         zhName: '哥伦比娅',
-        elementColor: Colors.grey,
+        elementColor: Color(0xFF498FCC), // 水元素
         elementIconPath: '',
       ),
       displayName: '「少女」哥伦比娅',
@@ -67,7 +67,7 @@ class OtherListPage extends StatelessWidget {
       character: Character(
         enName: 'Arlecchino',
         zhName: '阿蕾奇诺',
-        elementColor: Colors.grey,
+        elementColor: Color(0xFFEC4923), // 火元素
         elementIconPath: '',
       ),
       displayName: '「仆人」阿蕾奇诺',
@@ -86,8 +86,8 @@ class OtherListPage extends StatelessWidget {
     _Harbinger(
       character: Character(
         enName: 'Scaramouche',
-        zhName: '斯卡拉姆齐',
-        elementColor: Colors.grey,
+        zhName: '「散兵」斯卡拉姆齐',
+        elementColor: Color(0xFF359697), // 风元素
         elementIconPath: '',
       ),
       displayName: '「散兵」斯卡拉姆齐',
@@ -97,7 +97,7 @@ class OtherListPage extends StatelessWidget {
       character: Character(
         enName: 'Sandrone',
         zhName: '桑多涅',
-        elementColor: Colors.grey,
+        elementColor: Color(0xFF35AACC), // 冰元素
         elementIconPath: '',
       ),
       displayName: '「木偶」桑多涅',
@@ -127,7 +127,7 @@ class OtherListPage extends StatelessWidget {
       character: Character(
         enName: 'Tartaglia',
         zhName: '达达利亚',
-        elementColor: Colors.grey,
+        elementColor: Color(0xFF498FCC), // 水元素
         elementIconPath: '',
       ),
       displayName: '「公子」达达利亚',
@@ -378,10 +378,11 @@ class _HarbingerButton extends StatelessWidget {
       borderRadius: 22,
       padding: const EdgeInsets.all(20),
       constraints: const BoxConstraints(minHeight: 64),
-      // 与“特殊角色”入口按钮同款的灰色半透明 + 灰色高光边框。
-      backgroundColor: Colors.grey,
+      // 元素色统一走 Character.elementColor：
+      // 桑多涅 = 冰、阿蕾奇诺 = 火、哥伦比娅 = 水，其余为灰色。
+      backgroundColor: harbinger.character.elementColor,
       backgroundOpacity: 0.35,
-      borderColor: Colors.grey.withValues(alpha: 0.6),
+      borderColor: harbinger.character.elementColor.withValues(alpha: 0.6),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: <Widget>[

@@ -22,7 +22,7 @@ class _Nation {
 
 /// 八个国家 / 地区及其主题色。
 ///
-/// TODO: 下面每个 Color 都是占位用的“淡彩”主题色，
+/// alreadyTODO: 下面每个 Color 都是占位用的“淡彩”主题色，
 /// 后续替换具体 Hex 值时只需修改对应行即可。
 const List<_Nation> _nations = <_Nation>[
   _Nation(nameZh: '蒙德', nameEn: 'Mondstadt', color: Color(0xFF359697)),

@@ -27,6 +27,14 @@ class _CharacterDetailPageState extends State<CharacterDetailPage> {
   /// 故事 Markdown 所在目录，必须与 pubspec.yaml 中声明的 assets 目录一致。
   static const String _storyAssetDir = 'assets/stories/';
 
+  /// 中文名与本地文件名不一致时的映射。
+  ///
+  /// 例如「散兵」斯卡拉姆齐的剧情文本实际存放在 `流浪者.md` 中，
+  /// 这里做一次别名替换，避免详情页拼出找不到的资源路径。
+  static const Map<String, String> _storyFileAliases = <String, String>{
+    '「散兵」斯卡拉姆齐': '流浪者',
+  };
+
   /// 本次实际读取的资源路径，例如 `assets/stories/米提亚.md`。
   ///
   /// 中文名两端若混入空格、制表符或换行，`rootBundle` 会直接抛
@@ -38,7 +46,12 @@ class _CharacterDetailPageState extends State<CharacterDetailPage> {
   @override
   void initState() {
     super.initState();
-    _storyAssetPath = '$_storyAssetDir${widget.character.zhName.trim()}.md';
+    final String storyName = widget.character.zhName.trim();
+    final String fileName = _storyFileAliases[storyName] ?? storyName;
+    if (fileName != storyName) {
+      debugPrint('故事文件名映射: $storyName → $fileName');
+    }
+    _storyAssetPath = '$_storyAssetDir$fileName.md';
     _storyFuture = _loadStory(_storyAssetPath);
   }
 
