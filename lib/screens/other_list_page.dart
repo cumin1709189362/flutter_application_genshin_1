@@ -31,6 +31,31 @@ class OtherListPage extends StatelessWidget {
   ///
   /// 每个分组自带左侧标题与组前间距，因此新增模块只需往这里追加一项。
   static const List<_OtherSection> _sections = <_OtherSection>[
+    // 旅行者放在最顶部；空 / 荧共用 `assets/stories/旅行者.md`，
+    // 详情页里的文件名映射负责把这两个中文名指向同一份剧情。
+    _OtherSection(
+      title: '旅行者',
+      entries: <_OtherEntry>[
+        _OtherEntry(
+          character: Character(
+            enName: 'Aether',
+            zhName: '空',
+            elementColor: Colors.grey,
+            elementIconPath: '',
+          ),
+          displayName: '空',
+        ),
+        _OtherEntry(
+          character: Character(
+            enName: 'Lumine',
+            zhName: '荧',
+            elementColor: Colors.grey,
+            elementIconPath: '',
+          ),
+          displayName: '荧',
+        ),
+      ],
+    ),
     _OtherSection(
       title: '愚人众执行官',
       entries: <_OtherEntry>[
@@ -445,7 +470,7 @@ class OtherListPage extends StatelessWidget {
                       ],
                     ),
                   ),
-                  // 数量由数据源动态计算，当前三个分组共 20 位。
+                  // 数量由数据源动态计算，当前四个分组共 22 位。
                   Text(
                     '$characterCount 位',
                     style: TextStyle(

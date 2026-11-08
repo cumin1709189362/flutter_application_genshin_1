@@ -29,11 +29,21 @@ class _CharacterDetailPageState extends State<CharacterDetailPage> {
 
   /// 中文名与本地文件名不一致时的映射。
   ///
-  /// 例如「散兵」斯卡拉姆齐的剧情文本实际存放在 `流浪者.md` 中，
-  /// 这里做一次别名替换，避免详情页拼出找不到的资源路径。
-  static const Map<String, String> _storyFileAliases = <String, String>{
-    '「散兵」斯卡拉姆齐': '流浪者',
-  };
+  /// - 「散兵」斯卡拉姆齐：剧情文本实际存放在 `流浪者.md` 中；
+  /// - 空 / 荧：两位旅行者共用同一份 `旅行者.md`，因此都强行改读该文件。
+  ///
+  /// 其余角色直接使用 `zhName` 作为文件名。
+  static String _resolveStoryFileName(String zhName) {
+    switch (zhName) {
+      case '「散兵」斯卡拉姆齐':
+        return '流浪者';
+      case '空':
+      case '荧':
+        return '旅行者';
+      default:
+        return zhName;
+    }
+  }
 
   /// 本次实际读取的资源路径，例如 `assets/stories/米提亚.md`。
   ///
@@ -47,7 +57,7 @@ class _CharacterDetailPageState extends State<CharacterDetailPage> {
   void initState() {
     super.initState();
     final String storyName = widget.character.zhName.trim();
-    final String fileName = _storyFileAliases[storyName] ?? storyName;
+    final String fileName = _resolveStoryFileName(storyName);
     if (fileName != storyName) {
       debugPrint('故事文件名映射: $storyName → $fileName');
     }
@@ -80,13 +90,15 @@ class _CharacterDetailPageState extends State<CharacterDetailPage> {
   /// （新增文件后没有重新打包），而不是 Dart 路径写错。
   Future<void> _logStoryManifest(String assetPath) async {
     try {
-      final AssetManifest manifest =
-          await AssetManifest.loadFromAssetBundle(rootBundle);
-      final List<String> stories = manifest
-          .listAssets()
-          .where((String key) => key.startsWith(_storyAssetDir))
-          .toList()
-        ..sort();
+      final AssetManifest manifest = await AssetManifest.loadFromAssetBundle(
+        rootBundle,
+      );
+      final List<String> stories =
+          manifest
+              .listAssets()
+              .where((String key) => key.startsWith(_storyAssetDir))
+              .toList()
+            ..sort();
 
       final bool contained = stories.contains(assetPath);
       debugPrint(
