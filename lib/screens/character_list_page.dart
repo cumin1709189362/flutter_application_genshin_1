@@ -739,12 +739,12 @@ const List<Character> _snezhnayaCharacters = <Character>[
     elementColor: Color(0xFF6957C2),
     elementIconPath: 'assets/elements/electro.png',
   ),
-  // TODO: 待补充诺伊的元素和颜色
+  // alreadyTODO: 待补充诺伊的元素和颜色
   Character(
     enName: 'Noy',
     zhName: '诺伊',
     elementColor: Colors.grey,
-    elementIconPath: 'assets/elements/cryo.png',
+    elementIconPath: 'assets/elements/empty.png',
   ),
   Character(
     enName: 'Odette',
