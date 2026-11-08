@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import '../widgets/aurora_background.dart';
 import '../widgets/solid_gradient_button.dart';
 import 'character_list_page.dart';
+import 'other_list_page.dart';
 
 /// 国家 / 地区条目。
 class _Nation {
@@ -41,20 +42,34 @@ class CatalogPage extends StatelessWidget {
   static const double _gap = 10.0;
 
   void _openCharacterList(BuildContext context, _Nation nation) {
+    _pushWithTransition(
+      context,
+      CharacterListPage(countryName: nation.nameZh),
+    );
+  }
+
+  /// 进入“特殊角色”列表页。
+  void _openOtherList(BuildContext context) {
+    _pushWithTransition(context, const OtherListPage());
+  }
+
+  /// 国家 / 特殊角色列表共用的转场。
+  ///
+  /// 使用普通的 Navigator.push 保留路由栈，
+  /// 返回键 / 安卓侧滑返回手势可以正常 pop 当前自定义转场。
+  void _pushWithTransition(BuildContext context, Widget page) {
     // 转场进行中时防止重复推入页面。
     final ModalRoute<dynamic>? currentRoute = ModalRoute.of(context);
     if (currentRoute != null && !currentRoute.isCurrent) {
       return;
     }
 
-    // 使用普通的 Navigator.push 保留路由栈，
-    // 返回键 / 安卓侧滑返回手势可以正常 pop 当前自定义转场。
     Navigator.of(context).push<void>(
       PageRouteBuilder<void>(
         transitionDuration: const Duration(milliseconds: 650),
         reverseTransitionDuration: const Duration(milliseconds: 420),
         pageBuilder: (context, animation, secondaryAnimation) {
-          return CharacterListPage(countryName: nation.nameZh);
+          return page;
         },
         transitionsBuilder: (context, animation, secondaryAnimation, child) {
           // 角色列表页淡入。
@@ -131,6 +146,108 @@ class CatalogPage extends StatelessWidget {
               ),
               // 中间留白，把下方的网格强行推到屏幕最底部。
               const Spacer(),
+              // “特殊角色”入口：与右侧列国家卡片同宽同高，紧贴 GridView 上方右对齐。
+              LayoutBuilder(
+                builder: (BuildContext context, BoxConstraints constraints) {
+                  // GridView 左右各有 10 内边距，两列之间再留 10 间距，
+                  // 因此单张卡片宽度 = (可用宽度 - 3 * gap) / 2。
+                  final double cardWidth =
+                      (constraints.maxWidth - _gap * 3) / 2;
+                  return Align(
+                    alignment: Alignment.centerRight,
+                    child: Padding(
+                      padding: const EdgeInsets.only(top: _gap, right: _gap),
+                      child: SizedBox(
+                        width: cardWidth,
+                        // 与 GridView 的 childAspectRatio 完全一致。
+                        height: cardWidth / 1.618,
+                        child: SolidGradientButton(
+                          onTap: () => _openOtherList(context),
+                          semanticLabel: '特殊角色 SPECIAL',
+                          backgroundColor: Colors.grey,
+                          backgroundOpacity: 0.35,
+                          borderColor: Colors.grey.withValues(alpha: 0.6),
+                          borderRadius: 22,
+                          padding: const EdgeInsets.fromLTRB(16, 14, 16, 15),
+                          // 微弱的投影，避免灰色卡片在极光背景上显得发飘。
+                          boxShadow: <BoxShadow>[
+                            BoxShadow(
+                              color: Colors.black.withValues(alpha: 0.12),
+                              blurRadius: 10,
+                              offset: const Offset(0, 3),
+                            ),
+                          ],
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: <Widget>[
+                              Row(
+                                children: <Widget>[
+                                  Container(
+                                    width: 16,
+                                    height: 1,
+                                    color: Colors.grey.withValues(alpha: 0.8),
+                                  ),
+                                  const Spacer(),
+                                  Container(
+                                    width: 7,
+                                    height: 7,
+                                    decoration: BoxDecoration(
+                                      shape: BoxShape.circle,
+                                      color: Colors.grey.withValues(alpha: 0.95),
+                                      boxShadow: <BoxShadow>[
+                                        BoxShadow(
+                                          color: Colors.grey.withValues(
+                                            alpha: 0.7,
+                                          ),
+                                          blurRadius: 12,
+                                          spreadRadius: 1,
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                ],
+                              ),
+                              const Spacer(),
+                              // 与国家卡片一致：大字中文在上，小字英文在下。
+                              Text(
+                                '特殊角色',
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
+                                style: TextStyle(
+                                  color: Colors.white,
+                                  fontSize: 23,
+                                  fontWeight: FontWeight.w400,
+                                  height: 1.0,
+                                  letterSpacing: 2.5,
+                                  shadows: <Shadow>[
+                                    Shadow(
+                                      color: Colors.grey.withValues(alpha: 0.55),
+                                      blurRadius: 18,
+                                    ),
+                                  ],
+                                ),
+                              ),
+                              const SizedBox(height: 7),
+                              Text(
+                                'SPECIAL',
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
+                                style: TextStyle(
+                                  color: Colors.grey.shade400,
+                                  fontSize: 10,
+                                  fontWeight: FontWeight.w500,
+                                  height: 1.0,
+                                  letterSpacing: 1.6,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                    ),
+                  );
+                },
+              ),
               GridView.builder(
                 shrinkWrap: true,
                 physics: const NeverScrollableScrollPhysics(),
