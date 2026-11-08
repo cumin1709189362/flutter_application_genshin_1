@@ -1070,6 +1070,25 @@ class _CharacterButton extends StatelessWidget {
   final Character character;
   final VoidCallback onTap;
 
+  /// 需要在中文名与元素图标之间额外插入「月轮」图标的角色。
+  static const List<String> _moonWheelNames = <String>[
+    '伊涅芙',
+    '菈乌玛',
+    '菲林斯',
+    '奈芙尔',
+    '兹白',
+    '莉奈娅',
+    '哥伦比娅',
+  ];
+
+  /// 月轮图标资源路径。
+  static const String _moonWheelIconPath = 'assets/elements/moon_wheel.png';
+
+  /// 当前角色是否需要显示月轮图标。
+  ///
+  /// 中文名两端可能混入空格，先 `trim()` 再比对。
+  bool get _showMoonWheel => _moonWheelNames.contains(character.zhName.trim());
+
   @override
   Widget build(BuildContext context) {
     return SolidGradientButton(
@@ -1117,34 +1136,57 @@ class _CharacterButton extends StatelessWidget {
                   letterSpacing: 2.0,
                 ),
               ),
+              // 部分角色在中文名与元素图标之间多一枚「月轮」图标，
+              // 尺寸与光效同右侧元素图标完全一致。
+              if (_showMoonWheel) ...<Widget>[
+                const SizedBox(width: 12),
+                const _GlowIcon(assetPath: _moonWheelIconPath),
+              ],
               const SizedBox(width: 12),
-              // 用 Container 的 boxShadow 给透明 PNG 图标叠加一圈
-              // 极淡的白色柔光，避免光晕盖过图标本身的细节。
-              Container(
-                decoration: BoxDecoration(
-                  shape: BoxShape.circle,
-                  boxShadow: <BoxShadow>[
-                    BoxShadow(
-                      color: Colors.white.withValues(alpha: 0.2),
-                      blurRadius: 4,
-                      spreadRadius: 0.5,
-                    ),
-                  ],
-                ),
-                child: Image.asset(
-                  character.elementIconPath,
-                  width: 24,
-                  height: 24,
-                  fit: BoxFit.contain,
-                  // 原始图标约 3000px 宽，按 24dp 显示时只需解码到 96px，
-                  // 避免几张超大 PNG 占满 ImageCache。
-                  cacheWidth: 96,
-                  excludeFromSemantics: true,
-                ),
-              ),
+              _GlowIcon(assetPath: character.elementIconPath),
             ],
           ),
         ],
+      ),
+    );
+  }
+}
+
+/// 带柔光的圆形小图标。
+///
+/// 用 Container 的 boxShadow 给透明 PNG 叠加一圈极淡的白色柔光，
+/// 避免光晕盖过图标本身的细节。元素图标与「月轮」图标共用这段渲染，
+/// 保证两者的尺寸（24×24）、光晕与解码方式完全一致。
+class _GlowIcon extends StatelessWidget {
+  const _GlowIcon({required this.assetPath, this.size = 24});
+
+  final String assetPath;
+
+  /// 图标边长，默认 24。
+  final double size;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      decoration: BoxDecoration(
+        shape: BoxShape.circle,
+        boxShadow: <BoxShadow>[
+          BoxShadow(
+            color: Colors.white.withValues(alpha: 0.2),
+            blurRadius: 4,
+            spreadRadius: 0.5,
+          ),
+        ],
+      ),
+      child: Image.asset(
+        assetPath,
+        width: size,
+        height: size,
+        fit: BoxFit.contain,
+        // 原始图标约 3000px 宽，按 24dp 显示时只需解码到 96px，
+        // 避免几张超大 PNG 占满 ImageCache。
+        cacheWidth: (size * 4).round(),
+        excludeFromSemantics: true,
       ),
     );
   }
