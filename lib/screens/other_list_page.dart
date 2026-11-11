@@ -295,10 +295,8 @@ class OtherListPage extends StatelessWidget {
           children: <Widget>[
             Positioned.fill(
               child: ListView(
-                // 内容不足一屏时也保留下拉回弹。
-                physics: const AlwaysScrollableScrollPhysics(
-                  parent: BouncingScrollPhysics(),
-                ),
+                // 不设置 physics：与国家角色页一样走平台默认
+                // （Android 到边即停 + 拉伸形变，iOS 系统回弹）。
                 // 顶部避让悬浮表头，左右与角色列表页保持一致。
                 padding: EdgeInsets.fromLTRB(
                   16 + padding.left,
