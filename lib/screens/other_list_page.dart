@@ -733,12 +733,14 @@ class _OtherEntryButton extends StatelessWidget {
 /// 完全一致。图标始终放在 24×24 的固定方块里，并用 [ClipRect] 裁掉多余部分，
 /// 因此无论图片本身多大，都不会影响按钮的高度与宽度。
 class _ElementIcon extends StatelessWidget {
-  const _ElementIcon({required this.assetPath, this.size = 24});
+  const _ElementIcon({required this.assetPath});
 
   final String assetPath;
 
-  /// 图标的固定占位边长，默认 24（与普通元素图标一致）。
-  final double size;
+  /// 图标固定边长：与 CharacterListPage 的元素图标一致（24）。
+  ///
+  /// 24 + 上下 padding 20 = 64，正好等于按钮的标准高度，不会撑破布局。
+  static const double _iconSize = 24;
 
   @override
   Widget build(BuildContext context) {
@@ -755,16 +757,16 @@ class _ElementIcon extends StatelessWidget {
       ),
       // 固定宽高 + 裁剪：图标再大也只在这个方块内绘制，绝不撑大按钮。
       child: SizedBox.square(
-        dimension: size,
+        dimension: _iconSize,
         child: ClipRect(
           child: Image.asset(
             assetPath,
             // TODO: 在此处调整 stellar_linchpin 图标大小，不要撑破按钮高度
-            width: size,
-            height: size,
+            width: _iconSize,
+            height: _iconSize,
             fit: BoxFit.contain,
             // 按 4 倍像素密度解码，避免大图缩小时发糊，也不会浪费内存。
-            cacheWidth: (size * 4).round(),
+            cacheWidth: (_iconSize * 4).round(),
             excludeFromSemantics: true,
           ),
         ),

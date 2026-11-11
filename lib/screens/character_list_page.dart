@@ -1158,12 +1158,12 @@ class _CharacterButton extends StatelessWidget {
 /// 避免光晕盖过图标本身的细节。元素图标与「月轮」图标共用这段渲染，
 /// 保证两者的尺寸（24×24）、光晕与解码方式完全一致。
 class _GlowIcon extends StatelessWidget {
-  const _GlowIcon({required this.assetPath, this.size = 24});
+  const _GlowIcon({required this.assetPath});
 
   final String assetPath;
 
-  /// 图标边长，默认 24。
-  final double size;
+  /// 图标边长：与 CharacterListPage 其他地方的元素图标一致（24）。
+  static const double _iconSize = 24;
 
   @override
   Widget build(BuildContext context) {
@@ -1180,12 +1180,12 @@ class _GlowIcon extends StatelessWidget {
       ),
       child: Image.asset(
         assetPath,
-        width: size,
-        height: size,
+        width: _iconSize,
+        height: _iconSize,
         fit: BoxFit.contain,
         // 原始图标约 3000px 宽，按 24dp 显示时只需解码到 96px，
         // 避免几张超大 PNG 占满 ImageCache。
-        cacheWidth: (size * 4).round(),
+        cacheWidth: (_iconSize * 4).round(),
         excludeFromSemantics: true,
       ),
     );
