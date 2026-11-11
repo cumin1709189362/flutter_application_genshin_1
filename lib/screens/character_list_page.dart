@@ -1070,27 +1070,42 @@ class _CharacterButton extends StatelessWidget {
   final Character character;
   final VoidCallback onTap;
 
-  /// 需要在中文名与元素图标之间额外插入「月轮」图标的角色。
-  static const List<String> _moonWheelNames = <String>[
-    '伊涅芙',
-    '菈乌玛',
-    '菲林斯',
-    '奈芙尔',
-    '兹白',
-    '莉奈娅',
-    '哥伦比娅',
-  ];
-
-  /// 月轮图标资源路径。
+  /// 需要在中文名与元素图标之间额外插入的图标资源。
   static const String _moonWheelIconPath = 'assets/elements/moon_wheel.png';
+  static const String _stellarLinchpinIconPath =
+      'assets/elements/stellar_linchpin.png';
 
-  /// 当前角色是否需要显示月轮图标。
+  /// 中文名 → 中文名与元素图标之间额外插入的图标。
   ///
-  /// 中文名两端可能混入空格，先 `trim()` 再比对。
-  bool get _showMoonWheel => _moonWheelNames.contains(character.zhName.trim());
+  /// 图标尺寸、柔光与解码方式统一由 [_GlowIcon] 负责，
+  /// 因此这里只登记“谁用哪张图”，新增角色时补一行即可。
+  static const Map<String, String> _extraIcons = <String, String>{
+    // 挪德卡莱 + 璃月：月轮
+    '伊涅芙': _moonWheelIconPath,
+    '菈乌玛': _moonWheelIconPath,
+    '菲林斯': _moonWheelIconPath,
+    '奈芙尔': _moonWheelIconPath,
+    '兹白': _moonWheelIconPath,
+    '莉奈娅': _moonWheelIconPath,
+    '哥伦比娅': _moonWheelIconPath,
+    // 至冬：始基力
+    '桑多涅': _stellarLinchpinIconPath,
+    '奥黛塔': _stellarLinchpinIconPath,
+    '薇斯纳': _stellarLinchpinIconPath,
+    '米提亚': _stellarLinchpinIconPath,
+    '安娜丝塔夏': _stellarLinchpinIconPath,
+    '达妮卡': _stellarLinchpinIconPath,
+  };
+
+  /// 当前角色要显示的附加图标，`null` 表示不显示。
+  ///
+  /// 中文名两端可能混入空格，先 `trim()` 再查表。
+  String? get _extraIconPath => _extraIcons[character.zhName.trim()];
 
   @override
   Widget build(BuildContext context) {
+    final String? extraIconPath = _extraIconPath;
+
     return SolidGradientButton(
       onTap: onTap,
       semanticLabel: '${character.zhName} ${character.enName}',
@@ -1136,11 +1151,11 @@ class _CharacterButton extends StatelessWidget {
                   letterSpacing: 2.0,
                 ),
               ),
-              // 部分角色在中文名与元素图标之间多一枚「月轮」图标，
+              // 部分角色在中文名与元素图标之间多一枚图标（月轮 / 始基力），
               // 尺寸与光效同右侧元素图标完全一致。
-              if (_showMoonWheel) ...<Widget>[
+              if (extraIconPath != null) ...<Widget>[
                 const SizedBox(width: 12),
-                const _GlowIcon(assetPath: _moonWheelIconPath),
+                _GlowIcon(assetPath: extraIconPath),
               ],
               const SizedBox(width: 12),
               _GlowIcon(assetPath: character.elementIconPath),
@@ -1155,8 +1170,8 @@ class _CharacterButton extends StatelessWidget {
 /// 带柔光的圆形小图标。
 ///
 /// 用 Container 的 boxShadow 给透明 PNG 叠加一圈极淡的白色柔光，
-/// 避免光晕盖过图标本身的细节。元素图标与「月轮」图标共用这段渲染，
-/// 保证两者的尺寸（24×24）、光晕与解码方式完全一致。
+/// 避免光晕盖过图标本身的细节。元素图标、月轮图标与始基力图标共用这段渲染，
+/// 保证三者的尺寸（24×24）、光晕与解码方式完全一致。
 class _GlowIcon extends StatelessWidget {
   const _GlowIcon({required this.assetPath});
 
