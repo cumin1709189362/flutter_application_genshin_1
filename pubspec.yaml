@@ -75,9 +75,11 @@ flutter:
 
   # 元素图标资源目录：与 Character.elementIconPath 中的路径保持一致。
   # 后续其他图片素材也可在此处继续声明。
+  # stories/ 是角色故事正文，voices/ 是角色语音文本（<角色名>_语音.md）。
   assets:
     - assets/elements/
     - assets/stories/
+    - assets/voices/
 
 # 应用图标生成配置：执行 `dart run flutter_launcher_icons` 后生效。
 flutter_launcher_icons:

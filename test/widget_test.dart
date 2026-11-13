@@ -5,6 +5,8 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:flutter_application_genshin_1/main.dart';
 import 'package:flutter_application_genshin_1/models/character.dart';
 import 'package:flutter_application_genshin_1/screens/character_detail_page.dart';
+import 'package:flutter_application_genshin_1/screens/character_voice_page.dart';
+import 'package:flutter_application_genshin_1/widgets/solid_gradient_button.dart';
 
 /// 使用手机竖屏尺寸，避免测试默认的 800x600 横屏视口
 /// 让目录页的双列黄金比例卡片变得过高而溢出。
@@ -259,6 +261,92 @@ void main() {
       find.byKey(const Key('character-detail-back-button')),
       findsOneWidget,
     );
+  });
+
+  testWidgets('角色详情页标题行右侧可进入语音页', (WidgetTester tester) async {
+    _usePhoneViewport(tester);
+    const Character huTao = Character(
+      enName: 'Hu Tao',
+      zhName: '胡桃',
+      elementColor: Color(0xFFEC4923),
+      elementIconPath: 'assets/elements/pyro.png',
+    );
+
+    await tester.pumpWidget(
+      const MaterialApp(home: CharacterDetailPage(character: huTao)),
+    );
+    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 900));
+
+    // 标题与按钮在同一行：按钮取角色元素色、与标题行高齐平。
+    expect(find.text('胡桃'), findsOneWidget);
+    final Finder voiceButton = find.text('角色语音→');
+    expect(voiceButton, findsOneWidget);
+
+    final SolidGradientButton button = tester.widget<SolidGradientButton>(
+      find.ancestor(
+        of: voiceButton,
+        matching: find.byType(SolidGradientButton),
+      ),
+    );
+    expect(button.backgroundColor, huTao.elementColor);
+    expect(button.borderRadius, 20);
+    expect(button.height, 40);
+
+    await _tapSolidButton(tester, voiceButton);
+
+    expect(
+      find.byKey(const Key('character-voice-back-button')),
+      findsOneWidget,
+    );
+    expect(find.text('胡桃 语音'), findsOneWidget);
+    expect(find.text('初次见面…'), findsOneWidget);
+    expect(find.textContaining('找本堂主有何贵干'), findsOneWidget);
+
+    // 语音页沿用故事页的标题与正文样式。
+    final Text voiceSection = tester.widget<Text>(find.text('初次见面…'));
+    expect(voiceSection.style?.fontSize, 20);
+    expect(voiceSection.style?.fontWeight, FontWeight.w700);
+
+    final Text voiceBody = tester.widget<Text>(find.textContaining('找本堂主有何贵干'));
+    expect(voiceBody.style?.fontSize, 16);
+    expect(voiceBody.style?.height, 1.8);
+
+    // 返回详情页后标题与语音入口仍在。
+    await tester.tap(find.byKey(const Key('character-voice-back-button')));
+    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 150));
+    await tester.pump(const Duration(milliseconds: 900));
+    expect(find.text('角色语音→'), findsOneWidget);
+  });
+
+  testWidgets('语音文件缺失时显示未收录提示', (WidgetTester tester) async {
+    _usePhoneViewport(tester);
+    await tester.pumpWidget(
+      MaterialApp(
+        home: CharacterVoicePage(
+          character: const Character(
+            enName: 'Missing',
+            zhName: '不存在的角色',
+            elementColor: Color(0xFF359697),
+            elementIconPath: 'assets/elements/anemo.png',
+          ),
+        ),
+      ),
+    );
+    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 500));
+
+    expect(find.text('语音未收录'), findsOneWidget);
+    expect(
+      find.byKey(const Key('character-voice-back-button')),
+      findsOneWidget,
+    );
+  });
+
+  testWidgets('语音资源已声明且可读取', (WidgetTester tester) async {
+    final data = await rootBundle.load('assets/voices/胡桃_语音.md');
+    expect(data.lengthInBytes, greaterThan(0));
   });
 
   testWidgets('七种元素图标资源均已声明且可读取', (WidgetTester tester) async {

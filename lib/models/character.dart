@@ -24,4 +24,33 @@ class Character {
 
   /// 元素图标的本地资源路径，例如 `assets/elements/anemo.png`。
   final String elementIconPath;
+
+  /// 中文名与本地 Markdown 文件名不一致时的映射。
+  ///
+  /// - 「散兵」斯卡拉姆齐：故事与语音实际存放在 `流浪者.md` / `流浪者_语音.md`；
+  /// - 空 / 荧：两位旅行者共用 `旅行者` 一份资源。
+  ///
+  /// 其余角色直接使用 `zhName` 作为文件名。
+  static String _resolveAssetBaseName(String zhName) {
+    switch (zhName) {
+      case '「散兵」斯卡拉姆齐':
+        return '流浪者';
+      case '空':
+      case '荧':
+        return '旅行者';
+      default:
+        return zhName;
+    }
+  }
+
+  /// 故事正文资源路径，例如 `assets/stories/胡桃.md`。
+  ///
+  /// 中文名两端若混入空格、制表符或换行，`rootBundle` 会直接抛
+  /// Asset not found，所以这里统一 `trim()` 后再拼路径。
+  String get storyAssetPath =>
+      'assets/stories/${_resolveAssetBaseName(zhName.trim())}.md';
+
+  /// 角色语音资源路径，例如 `assets/voices/胡桃_语音.md`。
+  String get voiceAssetPath =>
+      'assets/voices/${_resolveAssetBaseName(zhName.trim())}_语音.md';
 }

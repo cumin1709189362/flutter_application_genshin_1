@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../models/character.dart';
+import '../utils/page_routes.dart';
 import '../widgets/aurora_background.dart';
 import '../widgets/solid_gradient_button.dart';
 import 'character_detail_page.dart';
@@ -372,31 +373,8 @@ class OtherListPage extends StatelessWidget {
       return;
     }
 
-    Navigator.of(context).push<void>(
-      PageRouteBuilder<void>(
-        transitionDuration: const Duration(milliseconds: 620),
-        reverseTransitionDuration: const Duration(milliseconds: 420),
-        pageBuilder: (context, animation, secondaryAnimation) {
-          return CharacterDetailPage(character: character);
-        },
-        transitionsBuilder: (context, animation, secondaryAnimation, child) {
-          final Animation<double> fadeIn = CurvedAnimation(
-            parent: animation,
-            curve: Curves.easeInOut,
-          );
-          // 详情页从略小放大到全屏，和背后列表页的放大淡出叠在一起。
-          final Animation<double> scaleIn = Tween<double>(begin: 0.92, end: 1.0)
-              .animate(
-                CurvedAnimation(parent: animation, curve: Curves.easeOutCubic),
-              );
-
-          return FadeTransition(
-            opacity: fadeIn,
-            child: ScaleTransition(scale: scaleIn, child: child),
-          );
-        },
-      ),
-    );
+    final Widget page = CharacterDetailPage(character: character);
+    Navigator.of(context).push<void>(characterPageRoute(page));
   }
 
   /// 悬浮半透明表头：返回按钮 + 标题 + 数量，与角色列表页完全一致。
