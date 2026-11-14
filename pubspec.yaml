@@ -19,7 +19,7 @@ publish_to: 'none' # Remove this line if you wish to publish to pub.dev
 # 版本号规则：`主.次.修订+构建号`。
 # 构建号（+ 后面的数字）每次打包发布都要加 1，Android 用它判断"是不是新版本"；
 # 一直保持 +0 会导致覆盖安装时的版本比较行为不明确。
-version: 1.7.2+1
+version: 1.7.2+2
 
 environment:
   sdk: ^3.13.7
