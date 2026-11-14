@@ -413,40 +413,46 @@ class OtherListPage extends StatelessWidget {
                   ),
                   const SizedBox(width: 4),
                   Expanded(
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: <Widget>[
-                        Text(
-                          '特殊角色',
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis,
-                          style: TextStyle(
-                            color: Colors.white,
-                            fontSize: 25,
-                            fontWeight: FontWeight.w500,
-                            height: 1.1,
-                            letterSpacing: 4,
-                            shadows: <Shadow>[
-                              Shadow(
-                                color: Colors.white.withValues(alpha: 0.45),
-                                blurRadius: 18,
-                              ),
-                            ],
+                    // 系统字号放大时整组标题等比缩小，避免撑破固定 64 高的表头。
+                    child: FittedBox(
+                      fit: BoxFit.scaleDown,
+                      alignment: Alignment.centerLeft,
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: <Widget>[
+                          Text(
+                            '特殊角色',
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                            style: TextStyle(
+                              color: Colors.white,
+                              fontSize: 25,
+                              fontWeight: FontWeight.w500,
+                              height: 1.1,
+                              letterSpacing: 4,
+                              shadows: <Shadow>[
+                                Shadow(
+                                  color: Colors.white.withValues(alpha: 0.45),
+                                  blurRadius: 18,
+                                ),
+                              ],
+                            ),
                           ),
-                        ),
-                        const SizedBox(height: 4),
-                        Text(
-                          '角色列表',
-                          style: TextStyle(
-                            color: Colors.white.withValues(alpha: 0.52),
-                            fontSize: 10,
-                            fontWeight: FontWeight.w400,
-                            height: 1.0,
-                            letterSpacing: 4,
+                          const SizedBox(height: 4),
+                          Text(
+                            '角色列表',
+                            style: TextStyle(
+                              color: Colors.white.withValues(alpha: 0.52),
+                              fontSize: 10,
+                              fontWeight: FontWeight.w400,
+                              height: 1.0,
+                              letterSpacing: 4,
+                            ),
                           ),
-                        ),
-                      ],
+                        ],
+                      ),
                     ),
                   ),
                   // 数量由数据源动态计算，当前四个分组共 22 位。

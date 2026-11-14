@@ -1,4 +1,4 @@
-package com.example.flutter_application_genshin_1
+package com.projectgenshin.characters
 
 import io.flutter.embedding.android.FlutterActivity
 

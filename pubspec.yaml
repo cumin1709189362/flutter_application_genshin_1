@@ -16,7 +16,10 @@ publish_to: 'none' # Remove this line if you wish to publish to pub.dev
 # https://developer.apple.com/library/archive/documentation/General/Reference/InfoPlistKeyReference/Articles/CoreFoundationKeys.html
 # In Windows, build-name is used as the major, minor, and patch parts
 # of the product and file versions while build-number is used as the build suffix.
-version: 1.7.2+0
+# 版本号规则：`主.次.修订+构建号`。
+# 构建号（+ 后面的数字）每次打包发布都要加 1，Android 用它判断"是不是新版本"；
+# 一直保持 +0 会导致覆盖安装时的版本比较行为不明确。
+version: 1.7.2+1
 
 environment:
   sdk: ^3.13.7
@@ -31,10 +34,10 @@ dependencies:
   flutter:
     sdk: flutter
 
-  # The following adds the Cupertino Icons font to your application.
-  # Use with the CupertinoIcons class for iOS style icons.
-  cupertino_icons: ^1.0.8
-  flutter_markdown: ^0.7.7+1
+  # 本项目刻意不引入任何第三方依赖：
+  # - 长文解析由 lib/models/character_text_document.dart 自行实现（不再使用 flutter_markdown）
+  # - 图标全部来自 assets/elements/ 下的 PNG，不使用 Cupertino 图标字体
+  # 新增依赖前请先确认 Flutter SDK 自带能力确实无法满足。
 
 dev_dependencies:
   flutter_test:

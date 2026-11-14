@@ -28,7 +28,7 @@ const List<_Nation> _nations = <_Nation>[
   _Nation(nameZh: '蒙德', nameEn: 'Mondstadt', color: Color(0xFF359697)),
   _Nation(nameZh: '璃月', nameEn: 'Liyue', color: Color(0xFFCC9046)),
   _Nation(nameZh: '稻妻', nameEn: 'Inazuma', color: Color(0xFF6957C2)),
-  _Nation(nameZh: '须弥', nameEn: 'Sumeru', color: Color(0xFF66AD16)),
+  _Nation(nameZh: '须弥', nameEn: 'Sumeru', color: Color(0xFF64A038)),
   _Nation(nameZh: '枫丹', nameEn: 'Fontaine', color: Color(0xFF498FCC)),
   _Nation(nameZh: '纳塔', nameEn: 'Natlan', color: Color(0xFFEC4923)),
   _Nation(nameZh: '挪德卡莱', nameEn: 'Nod-Krai', color: Color(0xFFC7B8E8)),
@@ -42,10 +42,7 @@ class CatalogPage extends StatelessWidget {
   static const double _gap = 10.0;
 
   void _openCharacterList(BuildContext context, _Nation nation) {
-    _pushWithTransition(
-      context,
-      CharacterListPage(countryName: nation.nameZh),
-    );
+    _pushWithTransition(context, CharacterListPage(countryName: nation.nameZh));
   }
 
   /// 进入“特殊角色”列表页。
@@ -193,7 +190,9 @@ class CatalogPage extends StatelessWidget {
                                     height: 7,
                                     decoration: BoxDecoration(
                                       shape: BoxShape.circle,
-                                      color: Colors.grey.withValues(alpha: 0.95),
+                                      color: Colors.grey.withValues(
+                                        alpha: 0.95,
+                                      ),
                                       boxShadow: <BoxShadow>[
                                         BoxShadow(
                                           color: Colors.grey.withValues(
@@ -221,7 +220,9 @@ class CatalogPage extends StatelessWidget {
                                   letterSpacing: 2.5,
                                   shadows: <Shadow>[
                                     Shadow(
-                                      color: Colors.grey.withValues(alpha: 0.55),
+                                      color: Colors.grey.withValues(
+                                        alpha: 0.55,
+                                      ),
                                       blurRadius: 18,
                                     ),
                                   ],
