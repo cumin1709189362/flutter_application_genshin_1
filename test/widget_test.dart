@@ -4,8 +4,10 @@ import 'package:flutter_test/flutter_test.dart';
 
 import 'package:flutter_application_genshin_1/main.dart';
 import 'package:flutter_application_genshin_1/models/character.dart';
+import 'package:flutter_application_genshin_1/models/character_text_document.dart';
 import 'package:flutter_application_genshin_1/screens/character_detail_page.dart';
 import 'package:flutter_application_genshin_1/screens/character_voice_page.dart';
+import 'package:flutter_application_genshin_1/widgets/character_text_view.dart';
 import 'package:flutter_application_genshin_1/widgets/solid_gradient_button.dart';
 
 /// 使用手机竖屏尺寸，避免测试默认的 800x600 横屏视口
@@ -103,10 +105,9 @@ void main() {
       find.byKey(const Key('character-detail-back-button')),
       findsOneWidget,
     );
+
+    // 首屏：懒加载只构建视口附近的块。
     expect(find.textContaining('角色详细'), findsOneWidget);
-    expect(find.text('角色故事一'), findsOneWidget);
-    expect(find.text('角色故事1'), findsNothing);
-    expect(find.text('解锁条件：好感2级'), findsOneWidget);
     expect(find.text('-------------------------'), findsWidgets);
     expect(find.textContaining('这门技术历史悠久'), findsOneWidget);
     expect(find.textContaining('##'), findsNothing);
@@ -114,17 +115,42 @@ void main() {
     expect(find.text('ALBEDO'), findsNothing);
     expect(find.text('角色列表'), findsNothing);
 
+    final Text bodyText = tester.widget<Text>(find.textContaining('这门技术历史悠久'));
+    expect(bodyText.style?.fontSize, 16);
+    expect(bodyText.style?.height, 1.8);
+
+    // 「角色故事一」位于首屏之下，需要滚动触发按需构建。
+    final Finder detailList = find.descendant(
+      of: find.byKey(const Key('character-text-list')),
+      matching: find.byType(Scrollable),
+    );
+    await tester.scrollUntilVisible(
+      find.text('角色故事一'),
+      200,
+      scrollable: detailList,
+    );
+    await tester.pump();
+
+    expect(find.text('角色故事一'), findsOneWidget);
+    expect(find.text('角色故事1'), findsNothing);
+
     final Text storyTitle = tester.widget<Text>(find.text('角色故事一'));
     expect(storyTitle.style?.fontSize, 20);
     expect(storyTitle.style?.fontWeight, FontWeight.w700);
 
+    // 解锁条件紧跟章节标题，稍作滚动即可构建。
+    await tester.scrollUntilVisible(
+      find.text('解锁条件：好感2级'),
+      100,
+      scrollable: detailList,
+    );
+    await tester.pump();
+
+    expect(find.text('解锁条件：好感2级'), findsOneWidget);
+
     final Text unlockCondition = tester.widget<Text>(find.text('解锁条件：好感2级'));
     expect(unlockCondition.style?.fontSize, 14);
     expect(unlockCondition.style?.color, Colors.white70);
-
-    final Text bodyText = tester.widget<Text>(find.textContaining('这门技术历史悠久'));
-    expect(bodyText.style?.fontSize, 16);
-    expect(bodyText.style?.height, 1.8);
 
     // 从详情页的悬浮玻璃按钮返回角色列表。
     await tester.tap(find.byKey(const Key('character-detail-back-button')));
@@ -342,6 +368,92 @@ void main() {
       find.byKey(const Key('character-voice-back-button')),
       findsOneWidget,
     );
+  });
+
+  testWidgets('长语音页按块懒加载，滚动后再构建后续段落', (WidgetTester tester) async {
+    _usePhoneViewport(tester);
+    // 用 17KB / 220 块的语音资源验证页面接线。
+    // 注意：>50KB 的资源会被 AssetBundle.loadString 丢进 isolate 解码，
+    // 假时钟等不到结果，所以页面级用例刻意选了 50KB 以内的文件。
+    const Character chef = Character(
+      enName: 'Escoffier',
+      zhName: '爱可菲',
+      elementColor: Color(0xFF6BA8E5),
+      elementIconPath: '',
+    );
+
+    await tester.pumpWidget(
+      const MaterialApp(home: CharacterVoicePage(character: chef)),
+    );
+    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 900));
+    await tester.pump();
+
+    // 列表就绪，但只构建了首屏附近的少量文本块。
+    expect(find.byKey(const Key('character-text-list')), findsOneWidget);
+    expect(find.byType(Text).evaluate().length, lessThan(80));
+
+    // 文档末尾的台词此时还不存在；顶部标题已经构建。
+    expect(find.text('刀具和餐叉，准备就绪。'), findsNothing);
+    expect(find.text('爱可菲 语音'), findsOneWidget);
+
+    // 向下滚动后，末尾内容按需构建，顶部标题被回收。
+    await tester.scrollUntilVisible(
+      find.text('刀具和餐叉，准备就绪。'),
+      800,
+      scrollable: find.byType(Scrollable),
+      maxScrolls: 40,
+    );
+    await tester.pump();
+
+    expect(find.text('刀具和餐叉，准备就绪。'), findsOneWidget);
+    expect(find.text('爱可菲 语音'), findsNothing);
+  });
+
+  testWidgets('CharacterTextView 面对 2000 块文档也只渲染视口附近', (
+    WidgetTester tester,
+  ) async {
+    _usePhoneViewport(tester);
+    final List<CharacterTextBlock> blocks = <CharacterTextBlock>[
+      const CharacterTextBlock(
+        kind: CharacterTextBlockKind.characterName,
+        text: '测试角色',
+      ),
+      for (int index = 1; index <= 2000; index++)
+        CharacterTextBlock(
+          kind: CharacterTextBlockKind.paragraph,
+          text: '第 $index 段正文',
+          spaceBefore: true,
+        ),
+    ];
+
+    await tester.pumpWidget(
+      MaterialApp(
+        home: Scaffold(
+          body: CharacterTextView(
+            document: CharacterTextDocument(blocks),
+            elementColor: Colors.blue,
+            padding: const EdgeInsets.all(24),
+            listKey: const Key('synthetic-text-list'),
+          ),
+        ),
+      ),
+    );
+    await tester.pump();
+
+    expect(find.byKey(const Key('synthetic-text-list')), findsOneWidget);
+    expect(find.byType(Text).evaluate().length, lessThan(100));
+    expect(find.text('第 2000 段正文'), findsNothing);
+
+    await tester.scrollUntilVisible(
+      find.text('第 2000 段正文'),
+      2000,
+      scrollable: find.byType(Scrollable),
+      maxScrolls: 60,
+    );
+    await tester.pump();
+
+    expect(find.text('第 2000 段正文'), findsOneWidget);
   });
 
   testWidgets('语音资源已声明且可读取', (WidgetTester tester) async {

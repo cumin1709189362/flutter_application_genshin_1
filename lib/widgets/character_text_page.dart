@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
 import '../models/character.dart';
+import '../models/character_text_document.dart';
 import '../widgets/aurora_background.dart';
 import '../widgets/character_text_view.dart';
 import '../widgets/solid_gradient_button.dart';
@@ -11,6 +12,10 @@ import '../widgets/solid_gradient_button.dart';
 /// 两页只有资源路径、“正在载入 / 未收录”文案、返回按钮 Key 以及
 /// 标题行右侧的附加控件不同；加载、空态、滚动与排版全部复用这里，
 /// 保证语音页与故事页的观感完全一致。
+///
+/// 正文渲染分三段：这里负责读取资源并在转场结束后解析成
+/// [CharacterTextDocument]，由 [CharacterTextView] 用 `ListView.builder`
+/// 只构建视口附近的文本块，因此页面再长也不会一次性布局整篇内容。
 class CharacterTextPage extends StatefulWidget {
   const CharacterTextPage({
     super.key,
@@ -52,22 +57,22 @@ class _CharacterTextPageState extends State<CharacterTextPage> {
   /// 让上一页的 620ms 转场先完成，再回到 UI Thread 解析长文本。
   static const Duration _deferParsingDuration = Duration(milliseconds: 650);
 
-  late final Future<String> _textFuture;
+  late final Future<CharacterTextDocument> _documentFuture;
 
   @override
   void initState() {
     super.initState();
-    _textFuture = _loadText(widget.assetPath);
+    _documentFuture = _loadDocument(widget.assetPath);
   }
 
-  Future<String> _loadText(String assetPath) async {
+  Future<CharacterTextDocument> _loadDocument(String assetPath) async {
     try {
       final String raw = await rootBundle.loadString(assetPath);
 
       // 文件读取本身是异步 I/O；这里再等转场结束，
-      // 避免在 PageRouteBuilder 动画期间做正则清洗和 Widget 列表构建。
+      // 避免在 PageRouteBuilder 动画期间做正则清洗和文档解析。
       await Future<void>.delayed(_deferParsingDuration);
-      return raw;
+      return parseCharacterTextDocument(raw);
     } catch (e, stackTrace) {
       debugPrint('加载失败: $e');
       debugPrint('尝试读取的资源路径: $assetPath');
@@ -129,41 +134,34 @@ class _CharacterTextPageState extends State<CharacterTextPage> {
         child: Stack(
           children: <Widget>[
             Positioned.fill(
-              child: FutureBuilder<String>(
-                future: _textFuture,
+              child: FutureBuilder<CharacterTextDocument>(
+                future: _documentFuture,
                 builder:
-                    (BuildContext context, AsyncSnapshot<String> snapshot) {
+                    (
+                      BuildContext context,
+                      AsyncSnapshot<CharacterTextDocument> snapshot,
+                    ) {
                       if (snapshot.connectionState == ConnectionState.waiting) {
                         return _buildLoading();
                       }
-                      if (snapshot.hasError) {
+
+                      final CharacterTextDocument? document = snapshot.data;
+                      if (snapshot.hasError ||
+                          document == null ||
+                          document.isEmpty) {
                         return _buildMessage(widget.emptyLabel);
                       }
 
-                      final String raw = snapshot.data ?? '';
-                      if (raw.trim().isEmpty) {
-                        return _buildMessage(widget.emptyLabel);
-                      }
-
-                      final List<Widget> blocks = buildCharacterTextBlocks(
-                        raw: raw,
+                      return CharacterTextView(
+                        document: document,
                         elementColor: widget.character.elementColor,
                         titleAction: widget.titleAction,
-                      );
-                      if (blocks.isEmpty) {
-                        return _buildMessage(widget.emptyLabel);
-                      }
-
-                      return SingleChildScrollView(
+                        listKey: const Key('character-text-list'),
                         padding: EdgeInsets.fromLTRB(
                           _horizontalPadding,
                           safe.top + _topContentGap,
                           _horizontalPadding,
                           safe.bottom + _bottomContentGap,
-                        ),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.stretch,
-                          children: blocks,
                         ),
                       );
                     },

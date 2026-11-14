@@ -11,6 +11,9 @@ import 'package:flutter/material.dart';
 ///
 /// 动画由 [AnimationController] 驱动，所有周期函数都使用 2π 的整数倍，
 /// 因此循环播放时首尾可以无缝衔接。
+///
+/// 为了给正文滚动让出帧预算：动画进度会量化到约 30fps 再重绘，
+/// 静态暗角则单独成层，不再参与每帧的动态绘制。
 class AuroraBackground extends StatefulWidget {
   const AuroraBackground({
     super.key,
@@ -30,6 +33,23 @@ class AuroraBackground extends StatefulWidget {
 
 class _AuroraBackgroundState extends State<AuroraBackground>
     with SingleTickerProviderStateMixin {
+  /// 背景重绘的目标帧率。
+  ///
+  /// 极光 26 秒才走完一轮，运动非常缓慢；每帧却要铺 4 个全屏径向渐变、
+  /// 96 个星点和一次暗角，和正文滚动共用同一份帧预算。把进度量化到
+  /// 约 30fps 后，60Hz 的 tick 只产生一半的真实重绘，肉眼观感不变。
+  static const int _targetFramesPerSecond = 30;
+
+  /// 静态暗角：独立成一层后不必每帧重画一次全屏渐变。
+  static final BoxDecoration _vignetteDecoration = BoxDecoration(
+    gradient: RadialGradient(
+      center: Alignment.center,
+      radius: 1.15,
+      colors: <Color>[Colors.transparent, Colors.black.withValues(alpha: 0.62)],
+      stops: const <double>[0.50, 1.0],
+    ),
+  );
+
   late final AnimationController _controller;
 
   @override
@@ -80,15 +100,38 @@ class _AuroraBackgroundState extends State<AuroraBackground>
             animation: _controller,
             builder: (context, _) {
               return CustomPaint(
-                painter: _AuroraPainter(progress: _controller.value),
+                painter: _AuroraPainter(progress: _quantizedProgress()),
+                // 内容每帧都在缓慢变化，提示光栅缓存不必为它建立缓存。
+                willChange: true,
                 child: const SizedBox.expand(),
               );
             },
           ),
         ),
+        // 静态暗角放在动画层之上、页面内容之下，层序与原来完全一致：
+        // 页面文字不会被压暗，极光则始终被暗角收边。
+        DecoratedBox(decoration: _vignetteDecoration),
         if (widget.child != null) widget.child!,
       ],
     );
+  }
+
+  /// 把 0~1 的进度量化到约 [_targetFramesPerSecond] 的步进上。
+  ///
+  /// `_AuroraPainter.shouldRepaint` 比较量化后的进度，因此同一档位内
+  /// 的 tick 不会触发重新绘制。
+  double _quantizedProgress() {
+    final int steps = _stepCount;
+    return (_controller.value * steps).round() / steps;
+  }
+
+  int get _stepCount {
+    final int steps =
+        (widget.duration.inMicroseconds *
+                _targetFramesPerSecond /
+                Duration.microsecondsPerSecond)
+            .round();
+    return math.max(steps, 2);
   }
 }
 
@@ -240,7 +283,6 @@ class _AuroraPainter extends CustomPainter {
 
     _paintAurora(canvas, size);
     _paintStars(canvas, size);
-    _paintVignette(canvas, size);
   }
 
   /// 绘制缓慢流动的极光光带。
@@ -301,21 +343,9 @@ class _AuroraPainter extends CustomPainter {
     }
   }
 
-  /// 四周暗角，让中心内容更聚焦。
-  void _paintVignette(Canvas canvas, Size size) {
-    final Rect rect = Offset.zero & size;
-    final Shader shader = RadialGradient(
-      center: Alignment.center,
-      radius: 1.15,
-      colors: <Color>[Colors.transparent, Colors.black.withValues(alpha: 0.62)],
-      stops: const <double>[0.50, 1.0],
-    ).createShader(rect);
-
-    canvas.drawRect(rect, Paint()..shader = shader);
-  }
-
   @override
   bool shouldRepaint(covariant _AuroraPainter oldDelegate) {
+    // progress 已在 _AuroraBackgroundState 中被量化，同一档位内不会重绘。
     return oldDelegate.progress != progress;
   }
 }
