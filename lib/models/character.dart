@@ -53,4 +53,10 @@ class Character {
   /// 角色语音资源路径，例如 `assets/voices/胡桃_语音.md`。
   String get voiceAssetPath =>
       'assets/voices/${_resolveAssetBaseName(zhName.trim())}_语音.md';
+
+  /// 是否共用「旅行者」这一份资源（空 / 荧）。
+  ///
+  /// 语音页据此决定要不要给台词里的「旅行者：」「派蒙：」染色：
+  /// 只有这份双人对话稿需要突出说话人，其他角色的语音保持原样。
+  bool get isTraveler => _resolveAssetBaseName(zhName.trim()) == '旅行者';
 }

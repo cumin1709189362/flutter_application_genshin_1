@@ -30,6 +30,7 @@ class CharacterTextBlock {
     required this.kind,
     required this.text,
     this.spaceBefore = false,
+    this.speaker,
   });
 
   final CharacterTextBlockKind kind;
@@ -39,6 +40,12 @@ class CharacterTextBlock {
 
   /// 与上一块之间是否需要 16 的呼吸间距（对应旧实现的 `addSpace()`）。
   final bool spaceBefore;
+
+  /// 台词行首的说话人姓名（不含冒号），例如语音稿里的「旅行者」「派蒙」。
+  ///
+  /// 只在整行以「姓名：」开头时记录；视图层据此只给「姓名：」这几个字染色，
+  /// 正文中间出现的同名文字仍沿用普通正文样式。
+  final String? speaker;
 }
 
 /// 整篇角色长文。
@@ -83,9 +90,14 @@ CharacterTextDocument parseCharacterTextDocument(String raw) {
     lastWasSpace = true;
   }
 
-  void emit(CharacterTextBlockKind kind, String text) {
+  void emit(CharacterTextBlockKind kind, String text, {String? speaker}) {
     blocks.add(
-      CharacterTextBlock(kind: kind, text: text, spaceBefore: pendingSpace),
+      CharacterTextBlock(
+        kind: kind,
+        text: text,
+        spaceBefore: pendingSpace,
+        speaker: speaker,
+      ),
     );
     pendingSpace = false;
     lastWasSpace = false;
@@ -132,7 +144,13 @@ CharacterTextDocument parseCharacterTextDocument(String raw) {
     } else if (text.startsWith('来源页面') || text.startsWith('来源：')) {
       emit(CharacterTextBlockKind.sourceLine, text);
     } else {
-      emit(CharacterTextBlockKind.paragraph, text);
+      // 语音稿的一句台词就是一段，行首的「姓名：」单独记下来，
+      // 让视图层可以只给姓名染色而不必在 build() 里再切字符串。
+      emit(
+        CharacterTextBlockKind.paragraph,
+        text,
+        speaker: _speakerPattern.firstMatch(text)?.group(1),
+      );
     }
   }
 
@@ -148,6 +166,12 @@ final RegExp _listPattern = RegExp(r'^\s{0,3}(?:[-*+]|\d+\.)\s+');
 final RegExp _rulePattern = RegExp(r'^\s{0,3}(?:[-*_]\s*){3,}$');
 final RegExp _fencePattern = RegExp(r'^\s*```');
 final RegExp _storyPattern = RegExp(r'^角色故事\s*(\d{1,2})$');
+
+/// 台词行首的「姓名：」。
+///
+/// 只认 2–4 个汉字加全角冒号：人名太短会把「我：」这类正文误判成台词，
+/// 太长又会把句子里的普通冒号（例如「来源页面：」）算进来。
+final RegExp _speakerPattern = RegExp(r'^([\u4e00-\u9fa5]{2,4})：');
 
 final RegExp _imagePattern = RegExp(r'!\[[^\]]*\]\([^)]*\)');
 final RegExp _linkPattern = RegExp(r'\[([^\]]+)\]\([^)]*\)');

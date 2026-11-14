@@ -25,6 +25,7 @@ class CharacterTextPage extends StatefulWidget {
     required this.emptyLabel,
     required this.backButtonKey,
     this.titleAction,
+    this.speakerColors,
   });
 
   /// 当前角色，提供元素主题色与中文名（用于资源排查日志）。
@@ -44,6 +45,11 @@ class CharacterTextPage extends StatefulWidget {
 
   /// 一级标题行右侧的附加控件（详情页放语音入口，语音页为 null）。
   final Widget? titleAction;
+
+  /// 台词说话人的姓名颜色（见 [CharacterTextView.speakerColors]）。
+  ///
+  /// 默认 null：故事页与此前完全一致；只有双人对话稿（旅行者语音）会传入。
+  final Map<String, Color>? speakerColors;
 
   @override
   State<CharacterTextPage> createState() => _CharacterTextPageState();
@@ -156,6 +162,7 @@ class _CharacterTextPageState extends State<CharacterTextPage> {
                         document: document,
                         elementColor: widget.character.elementColor,
                         titleAction: widget.titleAction,
+                        speakerColors: widget.speakerColors,
                         listKey: const Key('character-text-list'),
                         padding: EdgeInsets.fromLTRB(
                           _horizontalPadding,

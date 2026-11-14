@@ -13,7 +13,7 @@
 - 数据规模：8 个国家共 **124 位角色** + 「特殊角色」4 个分组 **22 条**（含 4 条与国家级列表重复），
   共 **146 个条目 / 142 个不重复角色名**；对应 `assets/stories/` 130 个 Markdown、`assets/voices/` 123 个。
 - 全部 UI 文案与代码注释使用**中文**；视觉风格是「暗色星空 + 极光 + 半透明玻璃卡片」。
-- 质量门槛：`dart analyze` 必须 0 issue，`flutter test` 必须 25 个用例全绿。
+- 质量门槛：`dart analyze` 必须 0 issue，`flutter test` 必须 28 个用例全绿。
 
 ---
 
@@ -34,7 +34,7 @@
 ```powershell
 flutter pub get        # 拉依赖（本项目实际没有第三方依赖）
 flutter analyze        # 静态检查，必须 0 issue
-flutter test           # 25 个用例，必须全绿
+flutter test           # 28 个用例，必须全绿
 flutter run            # 真机/模拟器调试
 flutter build apk --release
 ```
@@ -77,8 +77,8 @@ flutter_application_genshin_1/
 │  ├─ fonts/     Genshin_Impact_Font.ttf（约 6.9 MB，全局字体 family = GenshinFont）
 │  └─ icon/      仅用于 flutter_launcher_icons 生成启动图标，**不参与运行时**
 ├─ test/
-│  ├─ character_text_document_test.dart  解析器单测（12 个）
-│  └─ widget_test.dart                   界面/导航/懒加载测试（13 个）
+│  ├─ character_text_document_test.dart  解析器单测（14 个）
+│  └─ widget_test.dart                   界面/导航/懒加载测试（14 个）
 ├─ android/      Android 工程（包名、签名、清单）
 ├─ .widget_preview/  Flutter widget preview 的脚手架产物，**与本项目无关，勿改**
 ├─ pubspec.yaml  依赖、字体、资源目录声明
@@ -91,16 +91,16 @@ flutter_application_genshin_1/
 |---|---|
 | `lib/main.dart` | `MaterialApp`（dark、Material3、`fontFamily: 'GenshinFont'`、`splashFactory: NoSplash`）；`builder` 里统一注入透明状态栏 `AnnotatedRegion` 并把 `textScaler` 夹到 0.8~1.4；`main()` 里锁定竖屏 |
 | `lib/models/character.dart` | `@immutable`；字段 `enName / zhName / elementColor / elementIconPath`；`storyAssetPath`、`voiceAssetPath` 两个计算属性；`_resolveAssetBaseName` 处理文件名特例 |
-| `lib/models/character_text_document.dart` | `CharacterTextBlockKind`（5 种）、`CharacterTextBlock`、`CharacterTextDocument`、`parseCharacterTextDocument()`；不含任何 Widget |
+| `lib/models/character_text_document.dart` | `CharacterTextBlockKind`（5 种）、`CharacterTextBlock`（含台词说话人 `speaker`）、`CharacterTextDocument`、`parseCharacterTextDocument()`；不含任何 Widget |
 | `lib/screens/catalog_page.dart` | 私有 `_Nation` 模型 + 8 条常量；`_pushWithTransition` 负责「淡入 + 被压栈时放大淡出」 |
 | `lib/screens/character_list_page.dart` | 8 组 `const List<Character>`、`_charactersByCountry` 查表、`_toTitleCase`、悬浮表头、`_CharacterButton`、`_extraIcons` 映射、`_GlowIcon` |
 | `lib/screens/other_list_page.dart` | `_OtherSection` / `_OtherEntry` 两层私有模型；单行与两行两种按钮排版；自定义透明返回键 |
 | `lib/screens/character_detail_page.dart` | 参数装配；`_VoiceEntryButton`（40 高、圆角 20、元素色） |
-| `lib/screens/character_voice_page.dart` | 只换 `assetPath` 与两句文案 |
+| `lib/screens/character_voice_page.dart` | 只换 `assetPath`、两句文案与说话人姓名色（仅旅行者的双人对话稿） |
 | `lib/widgets/aurora_background.dart` | 静态底色 + 4 条径向渐变光带（`BlendMode.screen`）+ 96 星点 + 静态暗角；进度量化到 30fps；2π 整数倍周期，无缝循环 |
 | `lib/widgets/solid_gradient_button.dart` | `GestureDetector` + `AnimatedScale`，按下 0.95（110ms `easeOutCubic`）、回弹 420ms `elasticOut`；最短按压 110ms；`_busy` 350ms 防连点 |
-| `lib/widgets/character_text_page.dart` | `Future<CharacterTextDocument>`；`rootBundle.loadString` → 等 650ms → 解析；`FutureBuilder` 三态；`_logAssetManifest` 诊断；玻璃返回键 |
-| `lib/widgets/character_text_view.dart` | `ListView.builder`（`addAutomaticKeepAlives: false`、`addRepaintBoundaries: true`）；每块外包 `SizedBox(width: double.infinity)` 还原旧 `Column(stretch)` 语义 |
+| `lib/widgets/character_text_page.dart` | `Future<CharacterTextDocument>`；`rootBundle.loadString` → 等 650ms → 解析；`FutureBuilder` 三态；可选 `speakerColors` 透传给视图；`_logAssetManifest` 诊断；玻璃返回键 |
+| `lib/widgets/character_text_view.dart` | `ListView.builder`（`addAutomaticKeepAlives: false`、`addRepaintBoundaries: true`）；每块外包 `SizedBox(width: double.infinity)` 还原旧 `Column(stretch)` 语义；可选 `speakerColors` 只给行首「姓名：」染色 |
 | `lib/utils/page_routes.dart` | `characterPageRoute()`：620ms / 回退 420ms，淡入 + 0.92→1.0 放大 |
 
 ---
@@ -151,11 +151,13 @@ Character.zhName ──(_resolveAssetBaseName 特例)──► assets/stories|vo
                  └─ ListView.builder：只为视口附近的块创建 Widget
 ```
 
-解析规则（与 `character_text_document.dart` 的实现一一对应，改之前先读那 12 个单测）：
+解析规则（与 `character_text_document.dart` 的实现一一对应，改之前先读那 14 个单测）：
 
 - 一级标题 `#` → 角色名大标题；二级及以下标题 → 「分隔线 + 章节标题」合并成一块。
 - `角色故事N` 自动转中文数字（0–10），且紧跟其后的 `解锁条件` 行之间不插空行。
 - `解锁条件…` → 14px 白 70%；`来源页面…` / `来源：…` → 11px 白 35%；其余为正文。
+- 行首「姓名：」的正文会记录 `speaker`（2–4 个汉字 + 全角冒号）；视图层只在显式传入 `speakerColors` 时
+  给姓名与冒号染色，正文中间的同名文字不受影响。
 - 引用 `>`、列表 `- / * / + / 1.`、`---` 分隔线、` ``` ` 围栏行、图片、链接、`<br>`、HTML 标签、
   强调符、HTML 实体都会被清洗；空行只会让下一块带上一次 16px 间距。
 - 文档首块无间距、末尾不留间距。
@@ -184,6 +186,10 @@ Character.zhName ──(_resolveAssetBaseName 特例)──► assets/stories|vo
 > ⚠️ **同一个颜色只能有一个来源**：元素色从 `Character.elementColor` 取，
 > 目录页的国家色写 `catalog_page.dart` 的 `_nations`。**不要在新代码里再硬编码元素色值**；
 > 如果发现两处不一致（历史上须弥曾出现 `#66AD16` 与 `#64A038` 并存），以元素色为准修正。
+>
+> 唯一例外：旅行者语音的说话人姓名色（旅行者固定岩色、派蒙固定冰色）定义在
+> `character_voice_page.dart` 的 `_travelerSpeakerColors`。说话人不是可选角色，
+> 无法从 `Character.elementColor` 取值，因此允许在这里集中写一次。
 
 ### 5.2 字号阶梯
 
@@ -304,7 +310,7 @@ Character.zhName ──(_resolveAssetBaseName 特例)──► assets/stories|vo
 
 ## 8. 测试规范
 
-- 共 **25 个用例**：`character_text_document_test.dart` 12 个（解析器）、`widget_test.dart` 13 个（界面与接线）。
+- 共 **28 个用例**：`character_text_document_test.dart` 14 个（解析器）、`widget_test.dart` 14 个（界面与接线）。
 - 视口统一 `1170×2532 @3.0`（`_usePhoneViewport`），否则目录页会在默认 800×600 横屏下溢出。
 - **点击按钮后必须按两段 pump**：`SolidGradientButton` 有 110ms 最短按压 + 620/650ms 转场。
   直接用现成的 `_tapSolidButton(tester, finder)`，或 `pump()` → `pump(150ms)` → `pump(900ms)`。
@@ -385,7 +391,7 @@ Character.zhName ──(_resolveAssetBaseName 特例)──► assets/stories|vo
 ## 13. 提交前检查清单
 
 - [ ] `flutter analyze` 无 issue
-- [ ] `flutter test` 25 个用例全绿
+- [ ] `flutter test` 28 个用例全绿
 - [ ] 新增资源文件已落地，且目录已在 `pubspec.yaml` 声明
 - [ ] 新页面有返回入口 + 唯一 Key
 - [ ] 没有引入新依赖、新字号、新颜色值

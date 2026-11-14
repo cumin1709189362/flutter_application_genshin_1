@@ -118,6 +118,27 @@ void main() {
       expect(document.blocks.last.text, '来源页面：https://example.com/a');
     });
 
+    test('记录行首说话人，正文中的同名文字不影响', () {
+      final CharacterTextDocument document = parseCharacterTextDocument(
+        '旅行者：和派蒙一起出发吧。\n派蒙：好耶！',
+      );
+
+      expect(document.blocks[0].speaker, '旅行者');
+      expect(document.blocks[0].text, '旅行者：和派蒙一起出发吧。');
+      expect(document.blocks[0].spaceBefore, isFalse);
+      expect(document.blocks[1].speaker, '派蒙');
+      // 台词之间没有空行，与改动前一致，不额外插入 16px 间距。
+      expect(document.blocks[1].spaceBefore, isFalse);
+    });
+
+    test('姓名不在行首时不记录说话人', () {
+      final CharacterTextDocument document = parseCharacterTextDocument(
+        '这是正文，旅行者：不在行首',
+      );
+
+      expect(document.blocks.single.speaker, isNull);
+    });
+
     test('章节标题前的空行会保留间距', () {
       final CharacterTextDocument document = parseCharacterTextDocument(
         '正文\n\n## 角色详细',

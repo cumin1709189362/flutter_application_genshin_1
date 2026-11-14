@@ -337,6 +337,8 @@ void main() {
     final Text voiceBody = tester.widget<Text>(find.textContaining('找本堂主有何贵干'));
     expect(voiceBody.style?.fontSize, 16);
     expect(voiceBody.style?.height, 1.8);
+    // 非旅行者语音不传说话人颜色，仍是原来的单 Text 渲染。
+    expect(voiceBody.textSpan, isNull);
 
     // 返回详情页后标题与语音入口仍在。
     await tester.tap(find.byKey(const Key('character-voice-back-button')));
@@ -454,6 +456,65 @@ void main() {
     await tester.pump();
 
     expect(find.text('第 2000 段正文'), findsOneWidget);
+  });
+
+  testWidgets('CharacterTextView 只给说话人姓名染色，正文保持白色', (
+    WidgetTester tester,
+  ) async {
+    _usePhoneViewport(tester);
+    const CharacterTextDocument document = CharacterTextDocument(
+      <CharacterTextBlock>[
+        CharacterTextBlock(
+          kind: CharacterTextBlockKind.paragraph,
+          text: '旅行者：和派蒙一起出发吧。',
+          speaker: '旅行者',
+        ),
+        CharacterTextBlock(
+          kind: CharacterTextBlockKind.paragraph,
+          text: '派蒙：好耶！',
+          speaker: '派蒙',
+          spaceBefore: true,
+        ),
+      ],
+    );
+
+    await tester.pumpWidget(
+      MaterialApp(
+        home: Scaffold(
+          body: CharacterTextView(
+            document: document,
+            elementColor: Colors.blue,
+            padding: const EdgeInsets.all(24),
+            speakerColors: const <String, Color>{
+              '旅行者': Color(0xFFCC9046),
+              '派蒙': Color(0xFF35AACC),
+            },
+          ),
+        ),
+      ),
+    );
+    await tester.pump();
+
+    // 段落仍然是 Text，只是改用 TextSpan 渲染，正文样式保持不变。
+    final Text travelerLine = tester.widget<Text>(find.text('旅行者：和派蒙一起出发吧。'));
+    expect(travelerLine.style?.fontSize, 16);
+    expect(travelerLine.style?.color, Colors.white.withValues(alpha: 0.9));
+
+    final TextSpan travelerSpan = travelerLine.textSpan! as TextSpan;
+    final TextSpan travelerLabel = travelerSpan.children![0] as TextSpan;
+    expect(travelerLabel.text, '旅行者：');
+    expect(travelerLabel.style?.color, const Color(0xFFCC9046));
+
+    // 这一行正文里再次出现的「派蒙」仍是未单独设色的白色文字。
+    final TextSpan travelerBody = travelerSpan.children![1] as TextSpan;
+    expect(travelerBody.text, '和派蒙一起出发吧。');
+    expect(travelerBody.style, isNull);
+
+    final Text paimonLine = tester.widget<Text>(find.text('派蒙：好耶！'));
+    final TextSpan paimonSpan = paimonLine.textSpan! as TextSpan;
+    final TextSpan paimonLabel = paimonSpan.children![0] as TextSpan;
+    expect(paimonLabel.text, '派蒙：');
+    expect(paimonLabel.style?.color, const Color(0xFF35AACC));
   });
 
   testWidgets('语音资源已声明且可读取', (WidgetTester tester) async {
